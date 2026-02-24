@@ -1,12 +1,12 @@
 // lib/navigation/main_navigation.dart
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zidasp_app/providers/theme_provider.dart';
-import 'package:zidasp_app/screens/dashboard/dashboard_screen.dart';
-import 'package:zidasp_app/screens/profile/profile_screen.dart';
-import 'package:zidasp_app/screens/tide/tide_screen.dart';
-import 'package:zidasp_app/theme/app_theme.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:zidasp_app/theme/theme_controller.dart';
+import '../core/di.dart';
+import '../screens/dashboard/dashboard_screen.dart';
+import '../screens/profile/profile_screen.dart';
+import '../screens/tide/tide_screen.dart';
+import '../theme/app_theme.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({Key? key}) : super(key: key);
@@ -32,23 +32,25 @@ class _MainNavigationState extends State<MainNavigation> {
   
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    // Pega o controller de tema do DI
+    final themeController = di.get<ThemeController>();
     
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
         actions: [
-          // Botão para alternar tema
-          IconButton(
-            icon: Icon(themeProvider.isDarkMode 
-                ? Icons.light_mode 
-                : Icons.dark_mode),
-            onPressed: () {
-              themeProvider.toggleTheme();
+          // Watch para atualizar o ícone quando o tema mudar
+          Watch(
+            (context) {
+              final isDark = themeController.isDarkMode.value;
+              return IconButton(
+                icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+                onPressed: () {
+                  themeController.toggleTheme();
+                },
+                tooltip: isDark ? 'Modo Claro' : 'Modo Escuro',
+              );
             },
-            tooltip: themeProvider.isDarkMode 
-                ? 'Modo Claro' 
-                : 'Modo Escuro',
           ),
         ],
       ),

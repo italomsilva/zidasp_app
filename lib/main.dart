@@ -1,35 +1,33 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zidasp_app/providers/theme_provider.dart';
-import 'package:zidasp_app/providers/company_provider.dart';
-import 'package:zidasp_app/navigation/main_navigation.dart';
-import 'package:zidasp_app/theme/app_theme.dart';
+import 'package:signals/signals_flutter.dart';
+import 'package:zidasp_app/theme/theme_controller.dart';
+import 'core/di.dart';
+import 'navigation/main_navigation.dart';
+import 'theme/app_theme.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => CompanyProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const ZidaspApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class ZidaspApp extends StatelessWidget {
+  const ZidaspApp({Key? key}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    // Pega o controller de tema
+    final themeController = di.get<ThemeController>();
+    
+    // Watch faz o rebuild quando o signal mudar
+    return Watch(
+      (context) {
+        final themeMode = themeController.themeMode.value;
+        
         return MaterialApp(
           title: 'Zidasp',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: themeProvider.themeMode,
+          themeMode: themeMode,
           home: const MainNavigation(),
           debugShowCheckedModeBanner: false,
         );

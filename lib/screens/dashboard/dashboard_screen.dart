@@ -1,63 +1,57 @@
 // lib/screens/dashboard/dashboard_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zidasp_app/models/pond_model.dart';
-import 'package:zidasp_app/providers/company_provider.dart';
-import 'package:zidasp_app/theme/app_theme.dart';
-import 'package:zidasp_app/widgets/shared/custom_card.dart';
-import 'package:zidasp_app/widgets/shared/status_Indicator.dart';
-import 'package:zidasp_app/screens/viveiro/viveiro_detail_screen.dart';
+import 'package:signals/signals_flutter.dart';
+import '../../controllers/pond_controller.dart';
+import '../../core/di.dart';
+import '../../models/pond_model.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/shared/custom_card.dart';
+import '../../widgets/shared/status_Indicator.dart';
+import '../viveiro/viveiro_detail_screen.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends StatelessWidget {
   const DashboardScreen({Key? key}) : super(key: key);
   
   @override
-  _DashboardScreenState createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen> {
-  String? _selectedCompanyId;
-  
-  @override
   Widget build(BuildContext context) {
-    final companyProvider = Provider.of<CompanyProvider>(context);
+    final pondController = di.get<PondController>();
     
-    return RefreshIndicator(
-      onRefresh: () async {
-        await companyProvider.loadData();
-      },
-      child: CustomScrollView(
-        slivers: [
-          // Cabeçalho com seleção de empresa
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: _buildCompanySelector(companyProvider),
-            ),
-          ),
-          
-          // Lista de viveiros
-          if (_selectedCompanyId != null)
-            _buildPondsList(companyProvider)
-          else
-            const SliverFillRemaining(
-              child: Center(
-                child: Text('Selecione uma empresa para ver os viveiros'),
+    return Watch(
+      (context) {
+        return RefreshIndicator(
+          onRefresh: pondController.loadData,
+          child: CustomScrollView(
+            slivers: [
+              // Cabeçalho com seleção de empresa
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: _buildCompanySelector(context, pondController),
+                ),
               ),
-            ),
-        ],
-      ),
+              
+              // Lista de viveiros
+              if (pondController.selectedCompanyId.value != null)
+                _buildPondsList(pondController)
+              else
+                const SliverFillRemaining(
+                  child: Center(
+                    child: Text('Selecione uma empresa para ver os viveiros'),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
   
-  Widget _buildCompanySelector(CompanyProvider provider) {
-    final currentCompany = _selectedCompanyId != null 
-        ? provider.getCompanyById(_selectedCompanyId!) 
-        : null;
+  Widget _buildCompanySelector(BuildContext context, PondController controller) {
+    final currentCompany = controller.selectedCompany.value;
     
     return CustomCard(
       onTap: () {
-        _showCompanySelectionDialog(provider);
+        _showCompanySelectionDialog(context, controller);
       },
       child: Row(
         children: [
@@ -99,7 +93,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
   
-  void _showCompanySelectionDialog(CompanyProvider provider) {
+  void _showCompanySelectionDialog(BuildContext context, PondController controller) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -137,49 +131,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
               
               // Lista de empresas
               Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: provider.userCompanies.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final company = provider.userCompanies[index];
-                    return ListTile(
-                      onTap: () {
-                        setState(() {
-                          _selectedCompanyId = company.id;
-                        });
-                        Navigator.pop(context);
-                      },
-                      leading: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.shrimpAlert.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.business,
-                          color: AppColors.shrimpAlert,
-                          size: 20,
-                        ),
-                      ),
-                      title: Text(
-                        company.name,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                      subtitle: Text(
-                        '${company.totalPonds} viveiros',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      trailing: _selectedCompanyId == company.id
-                          ? Icon(
-                              Icons.check_circle,
+                child: Watch(
+                  (context) {
+                    return ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: controller.companies.value.length,
+                      separatorBuilder: (context, index) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final company = controller.companies.value[index];
+                        return ListTile(
+                          onTap: () {
+                            controller.selectCompany(company.id);
+                            Navigator.pop(context);
+                          },
+                          leading: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.shrimpAlert.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.business,
                               color: AppColors.shrimpAlert,
-                            )
-                          : null,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      tileColor: Theme.of(context).cardColor,
+                              size: 20,
+                            ),
+                          ),
+                          title: Text(
+                            company.name,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          subtitle: Text(
+                            '${company.totalPonds} viveiros',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          trailing: controller.selectedCompanyId.value == company.id
+                              ? Icon(
+                                  Icons.check_circle,
+                                  color: AppColors.shrimpAlert,
+                                )
+                              : null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          tileColor: Theme.of(context).cardColor,
+                        );
+                      },
                     );
                   },
                 ),
@@ -191,22 +187,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
   
-  Widget _buildPondsList(CompanyProvider provider) {
-    final ponds = _selectedCompanyId != null
-        ? provider.getPondsByCompany(_selectedCompanyId!)
-        : [];
-    
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final pond = ponds[index];
-          return Padding(
-            padding: EdgeInsets.fromLTRB(16, index == 0 ? 0 : 8, 16, 8),
-            child: PondCard(pond: pond),
-          );
-        },
-        childCount: ponds.length,
-      ),
+  Widget _buildPondsList(PondController controller) {
+    return Watch(
+      (context) {
+        final ponds = controller.filteredPonds.value;
+        
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final pond = ponds[index];
+              return Padding(
+                padding: EdgeInsets.fromLTRB(16, index == 0 ? 0 : 8, 16, 8),
+                child: PondCard(
+                  pond: pond,
+                  onFavoriteToggle: () => controller.toggleFavorite(pond.id),
+                ),
+              );
+            },
+            childCount: ponds.length,
+          ),
+        );
+      },
     );
   }
 }
@@ -214,13 +215,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
 // Widget do Card do Viveiro
 class PondCard extends StatelessWidget {
   final Pond pond;
+  final VoidCallback onFavoriteToggle;
   
-  const PondCard({Key? key, required this.pond}) : super(key: key);
+  const PondCard({
+    Key? key,
+    required this.pond,
+    required this.onFavoriteToggle,
+  }) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key(pond.id),
+      direction: DismissDirection.horizontal,
       background: Container(
         decoration: BoxDecoration(
           color: AppColors.healthGreen.withOpacity(0.1),
@@ -249,12 +256,10 @@ class PondCard extends StatelessWidget {
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
-          // Favoritar
-          return true;
-        } else {
-          // Configurar alertas
-          return true;
+          onFavoriteToggle();
+          return false; // Não remove, só atualiza
         }
+        return true; // Configurar alertas
       },
       child: GestureDetector(
         onTap: () {

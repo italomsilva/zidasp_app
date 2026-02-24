@@ -1,30 +1,40 @@
 // lib/screens/profile/profile_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zidasp_app/models/user_model.dart';
-import 'package:zidasp_app/providers/company_provider.dart';
-import 'package:zidasp_app/theme/app_theme.dart';
-import 'package:zidasp_app/widgets/shared/custom_card.dart';
+import 'package:signals/signals_flutter.dart';
+import '../../controllers/pond_controller.dart';
+import '../../core/di.dart';
+import '../../models/user_model.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/shared/custom_card.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
-    final companyProvider = Provider.of<CompanyProvider>(context);
-    final user = companyProvider.currentUser;
+    final pondController = di.get<PondController>();
     
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           // Informações pessoais
-          _buildUserInfoCard(context, user),
+          Watch(
+            (context) => _buildUserInfoCard(
+              context, 
+              pondController.currentUser.value,
+            ),
+          ),
           
           const SizedBox(height: 16),
           
           // Empresas associadas
-          _buildCompaniesCard(context, companyProvider),
+          Watch(
+            (context) => _buildCompaniesCard(
+              context, 
+              pondController,
+            ),
+          ),
           
           const SizedBox(height: 16),
           
@@ -135,7 +145,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
   
-  Widget _buildCompaniesCard(BuildContext context, CompanyProvider provider) {
+  Widget _buildCompaniesCard(BuildContext context, PondController controller) {
+    final companies = controller.companies.value;
+    
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +172,7 @@ class ProfileScreen extends StatelessWidget {
           
           const SizedBox(height: 12),
           
-          ...provider.userCompanies.map((company) {
+          ...companies.map((company) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
@@ -197,7 +209,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  // Ver detalhes da empresa
+                  controller.selectCompany(company.id);
                 },
               ),
             );
