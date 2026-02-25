@@ -37,20 +37,21 @@ class UserDTO {
   }
   
   // Cria DTO a partir de JSON (mock da API)
-  factory UserDTO.fromJson(Map<String, dynamic> json) {
-    return UserDTO(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      document: json['document'],
-      role: json['role'],
-      totalPonds: json['totalPonds'],
-      companiesCount: json['companiesCount'],
-      joinDate: DateTime.parse(json['joinDate']),
-      token: json['token'],
-    );
-  }
-  
+// Se você tem isso no DTO:
+factory UserDTO.fromJson(Map<String, dynamic> json) {
+  return UserDTO(
+    id: json['id'] as String,  // OK
+    name: json['name'] as String, // OK
+    email: json['email'] as String, // OK
+    document: json['document'] as String, // OK
+    role: json['role'] as String, // OK
+    joinDate: json['joinDate'] as DateTime, // PROBLEMA!
+    // O json['joinDate'] pode estar vindo como String, não DateTime
+    totalPonds: json['totalPonds'] as int, // OK
+    companiesCount: json['companiesCount'] as int, // OK
+    token: json['token'] as String, // OK
+  );
+}  
   // Para mock
   static UserDTO mock() {
     return UserDTO(

@@ -33,6 +33,11 @@ class DashboardController {
 
   final isSwitchingCompany = signal<bool>(false);
 
+
+  Future<void> initialize() async {
+    //todo implement
+  }
+
   Future<void> selectCompany(String companyId) async {
     if (selectedCompanyId.value == companyId) return;
 

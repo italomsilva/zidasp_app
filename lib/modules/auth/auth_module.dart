@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:zidasp_app/modules/auth/controllers/login_controller.dart';
 import '../../../modules/auth/repositories/user_repository.dart';
 import '../../../modules/auth/controllers/profile_controller.dart';
 
@@ -7,9 +8,13 @@ final getIt = GetIt.instance;
 class AuthModule {
   static void init() {
     getIt.registerLazySingleton<UserRepository>(() => UserRepository());
-    
+
     getIt.registerFactory<ProfileController>(
       () => ProfileController(getIt<UserRepository>()),
+    );
+
+    getIt.registerFactory<LoginController>(
+      () => LoginController(getIt<UserRepository>()),
     );
   }
 }
