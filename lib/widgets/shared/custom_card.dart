@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zidasp_app/theme/app_theme.dart';
+import 'package:zidasp_app/core/theme/app_theme.dart';
 
 class CustomCard extends StatelessWidget {
   final Widget child;

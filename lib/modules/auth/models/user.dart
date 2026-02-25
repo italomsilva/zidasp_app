@@ -1,21 +1,15 @@
-// lib/models/user_model.dart
+// lib/modules/auth/models/user_model.dart
 class User {
   final String id;
   final String name;
   final String email;
-  final String role;
-  final int totalPonds;
-  final int companiesCount;
-  final DateTime joinDate;
+  final String document;
   
   User({
     required this.id,
     required this.name,
     required this.email,
-    required this.role,
-    required this.totalPonds,
-    required this.companiesCount,
-    required this.joinDate,
+    required this.document,
   });
   
   String get initials => name

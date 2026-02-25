@@ -1,34 +1,27 @@
-// lib/core/di.dart
-import 'package:zidasp_app/controllers/pond_controller.dart';
-import 'package:zidasp_app/theme/theme_controller.dart';
+// lib/core/di/di.dart
+import 'package:get_it/get_it.dart';
+import 'package:zidasp_app/modules/auth/auth_module.dart';
+import 'package:zidasp_app/modules/pond/pond_module.dart';
+import 'package:zidasp_app/modules/tide/tide_module.dart';
+import 'core_module.dart';
 
-// Classe simples para segurar as instâncias
+final getIt = GetIt.instance;
+
 class DI {
-  static final DI _instance = DI._internal();
-  factory DI() => _instance;
-  DI._internal();
-
-  // Map para armazenar os controllers
-  final Map<Type, dynamic> _instances = {};
-
-  // Registra um controller (cria se não existir)
-  T get<T>() {
-    if (!_instances.containsKey(T)) {
-      if (T == ThemeController) {
-        _instances[T] = ThemeController();
-      } else if (T == PondController) {
-        _instances[T] = PondController();
-      }
-      // Adicione outros controllers aqui depois
-    }
-    return _instances[T] as T;
-  }
-
-  // Limpa tudo (útil para logout)
-  void disposeAll() {
-    _instances.clear();
+  static Future<void> init() async {
+    // Core primeiro (dependências globais)
+    await CoreModule.init();
+    
+    // Módulos
+    AuthModule.init();
+    PondModule.init();
+    TideModule.init();
   }
 }
 
-// Singleton global
-final di = DI();
+// Helper CORRIGIDO - especifica que T deve ser não-nullable
+T inject<T extends Object>() => getIt<T>();
+
+// Para parâmetros
+T injectParam<T extends Object, P extends Object>(P param) => 
+    getIt<T>(param1: param);

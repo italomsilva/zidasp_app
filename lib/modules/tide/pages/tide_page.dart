@@ -1,18 +1,21 @@
-// lib/screens/tide/tide_screen.dart
+// lib/modules/tide/screens/tide_screen.dart
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:zidasp_app/theme/app_theme.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/widgets/shared/custom_card.dart';
+import '../../../core/theme/app_theme.dart';
+import '../controllers/tide_controller.dart';
+import '../repositories/tide_repository.dart';
 
-class TideScreen extends StatefulWidget {
-  const TideScreen({Key? key}) : super(key: key);
+class TidePage extends StatefulWidget {
+  const TidePage({Key? key}) : super(key: key);
   
   @override
-  _TideScreenState createState() => _TideScreenState();
+  State<TidePage> createState() => _TidePageState();
 }
 
-class _TideScreenState extends State<TideScreen> {
-  DateTime _selectedDate = DateTime.now();
+class _TidePageState extends State<TidePage> {
+  // Controller com repository
+  late final controller = TideController(TideRepository());
   
   @override
   Widget build(BuildContext context) {
@@ -22,22 +25,36 @@ class _TideScreenState extends State<TideScreen> {
         _buildDateSelector(),
         
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              // Status atual da maré
-              _buildCurrentTideCard(),
+          child: Watch(
+            (context) {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
               
-              const SizedBox(height: 16),
+              if (controller.error.value != null) {
+                return Center(
+                  child: Text('Erro: ${controller.error.value}'),
+                );
+              }
               
-              // Próximas marés do dia
-              _buildTideScheduleCard(),
-              
-              const SizedBox(height: 16),
-              
-              // Calendário semanal
-              _buildWeeklyTideCard(),
-            ],
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Status atual da maré
+                  _buildCurrentTideCard(),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Próximas marés do dia
+                  _buildTideScheduleCard(),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Calendário semanal
+                  _buildWeeklyTideCard(),
+                ],
+              );
+            },
           ),
         ),
       ],
@@ -53,55 +70,39 @@ class _TideScreenState extends State<TideScreen> {
         children: [
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed: () {
-              setState(() {
-                _selectedDate = _selectedDate.subtract(const Duration(days: 1));
-              });
-            },
+            onPressed: controller.goToPreviousDay,
           ),
           
-          GestureDetector(
-            onTap: () async {
-              final date = await showDatePicker(
-                context: context,
-                initialDate: _selectedDate,
-                firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                lastDate: DateTime.now().add(const Duration(days: 365)),
-              );
-              if (date != null) {
-                setState(() {
-                  _selectedDate = date;
-                });
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today, size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    DateFormat('dd/MM/yyyy').format(_selectedDate),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+          Watch(
+            (context) {
+              return GestureDetector(
+                onTap: () => controller.selectDateFromPicker(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                ],
-              ),
-            ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        controller.formattedDate.value,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
           
           IconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: () {
-              setState(() {
-                _selectedDate = _selectedDate.add(const Duration(days: 1));
-              });
-            },
+            onPressed: controller.goToNextDay,
           ),
         ],
       ),
@@ -109,8 +110,7 @@ class _TideScreenState extends State<TideScreen> {
   }
   
   Widget _buildCurrentTideCard() {
-    final isHighTide = DateTime.now().hour < 12; // Exemplo
-    final nextTide = isHighTide ? 'Baixa-mar: 14:30' : 'Preia-mar: 19:45';
+    final tide = controller.currentTide;
     
     return CustomCard(
       child: Column(
@@ -127,16 +127,16 @@ class _TideScreenState extends State<TideScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isHighTide 
+                  color: tide['isHigh'] 
                       ? AppColors.neutralBlue.withOpacity(0.1)
                       : AppColors.shrimpAlert.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  isHighTide ? 'PREIA-MAR' : 'BAIXA-MAR',
+                  tide['type'],
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isHighTide ? AppColors.neutralBlue : AppColors.shrimpAlert,
+                    color: tide['isHigh'] ? AppColors.neutralBlue : AppColors.shrimpAlert,
                   ),
                 ),
               ),
@@ -163,11 +163,11 @@ class _TideScreenState extends State<TideScreen> {
               children: [
                 // Nível atual
                 Align(
-                  alignment: Alignment(0, isHighTide ? -0.3 : 0.3),
+                  alignment: Alignment(0, tide['isHigh'] ? -0.3 : 0.3),
                   child: Container(
                     width: double.infinity,
                     height: 4,
-                    color: isHighTide ? AppColors.neutralBlue : AppColors.shrimpAlert,
+                    color: tide['isHigh'] ? AppColors.neutralBlue : AppColors.shrimpAlert,
                   ),
                 ),
                 
@@ -211,7 +211,7 @@ class _TideScreenState extends State<TideScreen> {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Text(
-                    nextTide,
+                    tide['nextTide'],
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -226,7 +226,7 @@ class _TideScreenState extends State<TideScreen> {
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   Text(
-                    isHighTide ? '2.8m' : '0.5m',
+                    tide['height'],
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -241,83 +241,80 @@ class _TideScreenState extends State<TideScreen> {
   }
   
   Widget _buildTideScheduleCard() {
-    final tides = [
-      {'time': '06:45', 'type': 'Alta', 'height': '2.5m'},
-      {'time': '14:30', 'type': 'Baixa', 'height': '0.8m'},
-      {'time': '19:45', 'type': 'Alta', 'height': '2.8m'},
-      {'time': '02:15', 'type': 'Baixa', 'height': '0.5m'},
-    ];
-    
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Marés do Dia',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          
-          const SizedBox(height: 12),
-          
-          ...tides.map((tide) {
-            final isHigh = tide['type'] == 'Alta';
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: isHigh ? AppColors.neutralBlue : AppColors.shrimpAlert,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      tide['time']!,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isHigh 
-                          ? AppColors.neutralBlue.withOpacity(0.1)
-                          : AppColors.shrimpAlert.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      tide['type']!,
-                      style: TextStyle(
-                        color: isHigh ? AppColors.neutralBlue : AppColors.shrimpAlert,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    tide['height']!,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+    return Watch(
+      (context) {
+        final tides = controller.dailyTides.value;
+        
+        return CustomCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Marés do Dia',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            );
-          }).toList(),
-        ],
-      ),
+              
+              const SizedBox(height: 12),
+              
+              ...tides.map((tide) {
+                final isHigh = tide['type'] == 'Alta';
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: isHigh ? AppColors.neutralBlue : AppColors.shrimpAlert,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          tide['time']!,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isHigh 
+                              ? AppColors.neutralBlue.withOpacity(0.1)
+                              : AppColors.shrimpAlert.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          tide['type']!,
+                          style: TextStyle(
+                            color: isHigh ? AppColors.neutralBlue : AppColors.shrimpAlert,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        tide['height']!,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
   
   Widget _buildWeeklyTideCard() {
-    final weekDays = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
-    
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,11 +330,8 @@ class _TideScreenState extends State<TideScreen> {
           
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: weekDays.asMap().entries.map((entry) {
-              final index = entry.key;
-              final day = entry.value;
-              final isToday = index == DateTime.now().weekday - 1;
-              final isHighTide = index % 2 == 0;
+            children: controller.weeklyForecast.map((forecast) {
+              final isToday = forecast['day'] == _getTodayWeekDay();
               
               return Column(
                 children: [
@@ -355,7 +349,7 @@ class _TideScreenState extends State<TideScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        day[0], // Primeira letra
+                        forecast['initial'],
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: isToday 
@@ -367,16 +361,20 @@ class _TideScreenState extends State<TideScreen> {
                   ),
                   const SizedBox(height: 4),
                   Icon(
-                    isHighTide ? Icons.arrow_upward : Icons.arrow_downward,
+                    forecast['icon'],
                     size: 16,
-                    color: isHighTide ? AppColors.neutralBlue : AppColors.shrimpAlert,
+                    color: forecast['isHigh'] 
+                        ? AppColors.neutralBlue 
+                        : AppColors.shrimpAlert,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isHighTide ? 'Alta' : 'Baixa',
+                    forecast['type'],
                     style: TextStyle(
                       fontSize: 10,
-                      color: isHighTide ? AppColors.neutralBlue : AppColors.shrimpAlert,
+                      color: forecast['isHigh'] 
+                          ? AppColors.neutralBlue 
+                          : AppColors.shrimpAlert,
                     ),
                   ),
                 ],
@@ -386,5 +384,10 @@ class _TideScreenState extends State<TideScreen> {
         ],
       ),
     );
+  }
+  
+  String _getTodayWeekDay() {
+    final weekDays = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+    return weekDays[DateTime.now().weekday - 1];
   }
 }

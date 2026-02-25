@@ -1,6 +1,6 @@
 // lib/widgets/shared/device_controller.dart
 import 'package:flutter/material.dart';
-import '../../theme/app_theme.dart';
+import '../../../core/theme/app_theme.dart';
 
 class DeviceController extends StatefulWidget {
   final String deviceName;
