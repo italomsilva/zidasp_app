@@ -1,11 +1,12 @@
-// lib/modules/auth/controllers/login_controller.dart
 import 'package:signals/signals.dart';
+import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/modules/auth/repositories/user_repository.dart';
 
 enum LoginStatus { initial, loading, success, error }
 
 class LoginController {
   final UserRepository _repository;
+  final SessionController _sessionController;
 
   // Signals para campos do formulário
   final documentInput = signal<String>('');
@@ -23,11 +24,10 @@ class LoginController {
 
   // Computed para validar formulário
   late final isFormValid = computed(() {
-    return documentInput.value.isNotEmpty &&
-        passwordInput.value.isNotEmpty;
+    return documentInput.value.isNotEmpty && passwordInput.value.isNotEmpty;
   });
 
-  LoginController(this._repository);
+  LoginController(this._repository, this._sessionController);
 
   void setDocumentInput(String value) {
     documentInput.value = value;
@@ -64,6 +64,7 @@ class LoginController {
       passwordError.value = null;
     }
   }
+
   Future<bool> login() async {
     _validateDocument();
     _validatePassword();
@@ -76,14 +77,13 @@ class LoginController {
     errorMessage.value = null;
 
     try {
-      // Usar mockLogin por enquanto
-      final response = await _repository.login(documentInput.value, passwordInput.value);
+      final user = await _repository.login(
+        documentInput.value,
+        passwordInput.value,
+      );
 
       // Se "lembrar-me" estiver marcado, salvar credenciais (apenas token!)
-      if (rememberMe.value) {
-        // Salvar token no SharedPreferences
-        // await _saveToken(response.token);
-      }
+      _sessionController.saveUser(user.id, user.name, user.token);
 
       status.value = LoginStatus.success;
       return true;

@@ -2,6 +2,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
+import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/core/theme/theme_controller.dart';
 
 final getIt = GetIt.instance;
@@ -11,15 +12,19 @@ class CoreModule {
     // SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     getIt.registerSingleton<SharedPreferences>(prefs);
-    
+
+    getIt.registerSingleton<SessionController>(SessionController(prefs));
+
     // Dio (para futuras chamadas API)
-    getIt.registerLazySingleton<Dio>(() => Dio(
-      BaseOptions(
-        baseUrl: 'https://api.zidasp.com',
-        connectTimeout: const Duration(seconds: 30),
+    getIt.registerLazySingleton<Dio>(
+      () => Dio(
+        BaseOptions(
+          baseUrl: 'https://api.zidasp.com',
+          connectTimeout: const Duration(seconds: 30),
+        ),
       ),
-    ));
-    
+    );
+
     // ThemeController (global)
     getIt.registerSingleton<ThemeController>(ThemeController());
   }
