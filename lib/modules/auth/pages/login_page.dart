@@ -1,5 +1,6 @@
 // lib/modules/auth/pages/login_page.dart
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:signals/signals_flutter.dart';
 import '../../../core/di.dart';
 import '../../../core/theme/app_theme.dart';
@@ -38,16 +39,18 @@ class _LoginPageState extends State<LoginPage> {
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
+                        alignment: Alignment.center,
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
                           color: AppColors.shrimpAlert.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.waves_rounded,
+                        child: Icon(
+                          FontAwesomeIcons.shrimp,
                           size: 50,
                           color: AppColors.shrimpAlert,
                         ),

@@ -1,5 +1,6 @@
 // lib/navigation/main_navigation.dart
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/core/di.dart';
 import 'package:zidasp_app/modules/pond/pages/dashboard/dashboard_page.dart';
@@ -25,7 +26,7 @@ class _MainNavigationState extends State<MainNavigation> {
   ];
   
   final List<String> _titles = [
-    'Dashboard',
+    'Viveiros',
     'Marés',
     'Perfil',
   ];
@@ -51,8 +52,8 @@ class _MainNavigationState extends State<MainNavigation> {
             : const Color(0xFFFF6B6B),
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+            icon: FaIcon(FontAwesomeIcons.shrimp),
+            label: 'Viveiros',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.waves),
