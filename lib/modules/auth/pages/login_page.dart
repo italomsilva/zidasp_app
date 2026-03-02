@@ -1,7 +1,7 @@
-// lib/modules/auth/pages/login_page.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:zidasp_app/widgets/shared/custom_button.dart';
 import '../../../core/di.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/login_controller.dart';
@@ -15,14 +15,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   late final controller = inject<LoginController>();
-  
-  final _emailFocus = FocusNode();
-  final _passwordFocus = FocusNode();
-  
+    
   @override
   void dispose() {
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
     super.dispose();
   }
   
@@ -34,46 +29,34 @@ class _LoginPageState extends State<LoginPage> {
           slivers: [
             // Header com ilustração
             SliverToBoxAdapter(
-              child: Container(
-                height: 240,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.shrimpAlert.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          FontAwesomeIcons.shrimp,
-                          size: 50,
-                          color: AppColors.shrimpAlert,
-                        ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.shrimpAlert.withAlpha(100),
+                        shape: BoxShape.circle,
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Zidasp',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.shrimpAlert,
-                        ),
+                      child: Icon(
+                        FontAwesomeIcons.shrimp,
+                        size: 50,
+                        color: AppColors.shrimpAlert,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Plataforma para Aquicultura',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.shrimpAlert,
-                        ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Zidasp',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.shrimpAlert,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -85,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Título do formulário
                     const Text(
                       'Bem-vindo de volta!',
                       style: TextStyle(
@@ -104,17 +86,11 @@ class _LoginPageState extends State<LoginPage> {
                     
                     const SizedBox(height: 32),
                     
-                    // Campo de documento
                     Watch(
                       (context) => TextField(
                         onChanged: controller.setDocumentInput,
-                        focusNode: _emailFocus,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
-                        onEditingComplete: () {
-                          _emailFocus.unfocus();
-                          FocusScope.of(context).requestFocus(_passwordFocus);
-                        },
                         decoration: InputDecoration(
                           labelText: 'CPF (Somente números)',
                           hintText: '12345678900',
@@ -140,15 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                     Watch(
                       (context) => TextField(
                         onChanged: controller.setPasswordInput,
-                        focusNode: _passwordFocus,
                         obscureText: !controller.isPasswordVisible.value,
                         textInputAction: TextInputAction.done,
-                        onEditingComplete: () async {
-                          _passwordFocus.unfocus();
-                          if (controller.isFormValid.value) {
-                            await _handleLogin();
-                          }
-                        },
                         decoration: InputDecoration(
                           labelText: 'Senha',
                           hintText: '',
@@ -219,10 +188,10 @@ class _LoginPageState extends State<LoginPage> {
                           return Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: AppColors.shrimpAlert.withOpacity(0.1),
+                              color: AppColors.shrimpAlert.withValues(alpha:0.1),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: AppColors.shrimpAlert.withOpacity(0.3),
+                                color: AppColors.shrimpAlert.withValues(alpha:0.3),
                               ),
                             ),
                             child: Row(
@@ -251,42 +220,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     
                     const SizedBox(height: 16),
-                    
-                    // Botão de login
+
                     Watch(
-                      (context) => ElevatedButton(
-                        onPressed: controller.status.value == LoginStatus.loading
-                            ? null
-                            : _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.shrimpAlert,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: Colors.grey.shade300,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 2,
-                        ),
-                        child: controller.status.value == LoginStatus.loading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : const Text(
-                                'Entrar',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
+                      (context)=>CustomButton(onClick: _handleLogin, text: 'Entrar', isLoading: controller.status.value ==LoginStatus.loading,)
                     ),
                     
                     const SizedBox(height: 24),

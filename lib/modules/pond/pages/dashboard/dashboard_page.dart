@@ -178,7 +178,7 @@ class _DashboardPageState extends State<DashboardPage> {
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withValues(alpha:0.2),
             ),
           ),
           child: Row(
@@ -239,7 +239,7 @@ class _DashboardPageState extends State<DashboardPage> {
               Container(
                 height: 20,
                 width: 1,
-                color: Colors.grey.withOpacity(0.3),
+                color: Colors.grey.withValues(alpha:0.3),
               ),
               _buildStatItem(
                 label: 'Ativos',
@@ -249,7 +249,7 @@ class _DashboardPageState extends State<DashboardPage> {
               Container(
                 height: 20,
                 width: 1,
-                color: Colors.grey.withOpacity(0.3),
+                color: Colors.grey.withValues(alpha:0.3),
               ),
               _buildStatItem(
                 label: 'Alertas',
@@ -300,7 +300,7 @@ class _DashboardPageState extends State<DashboardPage> {
             Icon(
               Icons.error_outline,
               size: 48,
-              color: AppColors.shrimpAlert.withOpacity(0.5),
+              color: AppColors.shrimpAlert.withValues(alpha:0.5),
             ),
             const SizedBox(height: 16),
             Text(

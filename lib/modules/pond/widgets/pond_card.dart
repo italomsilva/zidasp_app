@@ -25,7 +25,7 @@ class PondCard extends StatelessWidget {
       direction: DismissDirection.horizontal,
       background: Container(
         decoration: BoxDecoration(
-          color: AppColors.healthGreen.withOpacity(0.1),
+          color: AppColors.healthGreen.withValues(alpha:0.1),
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Align(
@@ -38,7 +38,7 @@ class PondCard extends StatelessWidget {
       ),
       secondaryBackground: Container(
         decoration: BoxDecoration(
-          color: AppColors.shrimpAlert.withOpacity(0.1),
+          color: AppColors.shrimpAlert.withValues(alpha:0.1),
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Align(
@@ -168,7 +168,7 @@ class PondCard extends StatelessWidget {
       width: 70, // Largura fixa em vez de Expanded
       padding: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

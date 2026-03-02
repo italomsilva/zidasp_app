@@ -75,12 +75,12 @@ class _DeviceControllerState extends State<DeviceController> {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha:0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -96,7 +96,7 @@ class _DeviceControllerState extends State<DeviceController> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha:0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, size: 20, color: color),
@@ -166,8 +166,8 @@ class _DeviceControllerState extends State<DeviceController> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: _isOn 
-              ? color.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.2),
+              ? color.withValues(alpha:0.2)
+              : Colors.grey.withValues(alpha:0.2),
           border: Border.all(
             color: _isOn ? color : Colors.grey,
             width: 2,
@@ -185,7 +185,7 @@ class _DeviceControllerState extends State<DeviceController> {
               color: _isOn ? color : Colors.grey,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha:0.2),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -201,7 +201,7 @@ class _DeviceControllerState extends State<DeviceController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -244,8 +244,8 @@ class CompactDeviceController extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isOn 
-              ? AppColors.shrimpAlert.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.3),
+              ? AppColors.shrimpAlert.withValues(alpha:0.3)
+              : Colors.grey.withValues(alpha:0.3),
         ),
       ),
       child: Padding(

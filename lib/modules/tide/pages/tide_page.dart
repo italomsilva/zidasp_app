@@ -80,7 +80,7 @@ class _TidePageState extends State<TidePage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -128,8 +128,8 @@ class _TidePageState extends State<TidePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: tide['isHigh'] 
-                      ? AppColors.neutralBlue.withOpacity(0.1)
-                      : AppColors.shrimpAlert.withOpacity(0.1),
+                      ? AppColors.neutralBlue.withValues(alpha:0.1)
+                      : AppColors.shrimpAlert.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -152,8 +152,8 @@ class _TidePageState extends State<TidePage> {
               borderRadius: BorderRadius.circular(12),
               gradient: LinearGradient(
                 colors: [
-                  AppColors.neutralBlue.withOpacity(0.3),
-                  AppColors.shrimpAlert.withOpacity(0.3),
+                  AppColors.neutralBlue.withValues(alpha:0.3),
+                  AppColors.shrimpAlert.withValues(alpha:0.3),
                 ],
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
@@ -283,8 +283,8 @@ class _TidePageState extends State<TidePage> {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: isHigh 
-                              ? AppColors.neutralBlue.withOpacity(0.1)
-                              : AppColors.shrimpAlert.withOpacity(0.1),
+                              ? AppColors.neutralBlue.withValues(alpha:0.1)
+                              : AppColors.shrimpAlert.withValues(alpha:0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -340,7 +340,7 @@ class _TidePageState extends State<TidePage> {
                     height: 40,
                     decoration: BoxDecoration(
                       color: isToday 
-                          ? AppColors.shrimpAlert.withOpacity(0.1)
+                          ? AppColors.shrimpAlert.withValues(alpha:0.1)
                           : Colors.transparent,
                       shape: BoxShape.circle,
                       border: isToday 

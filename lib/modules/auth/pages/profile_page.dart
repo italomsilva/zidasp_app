@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // Avatar
           CircleAvatar(
             radius: 50,
-            backgroundColor: AppColors.shrimpAlert.withOpacity(0.1),
+            backgroundColor: AppColors.shrimpAlert.withValues(alpha:0.1),
             child: Watch(
               (context) => Text(
                 controller.userInitials.value,
@@ -92,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: controller.getRoleColor(controller.userRole.value).withOpacity(0.1),
+                color: controller.getRoleColor(controller.userRole.value).withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -188,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.shrimpAlert.withOpacity(0.1),
+                        color: AppColors.shrimpAlert.withValues(alpha:0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -204,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: controller.getRoleColor(company.userRole).withOpacity(0.1),
+                        color: controller.getRoleColor(company.userRole).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
