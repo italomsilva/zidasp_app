@@ -1,4 +1,3 @@
-// // lib/models/company_model.dart
 class Company {
   final String id;
   final String name;

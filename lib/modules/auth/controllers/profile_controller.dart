@@ -1,6 +1,4 @@
-// lib/modules/auth/controllers/profile_controller.dart
 import 'dart:ui';
-
 import 'package:signals/signals.dart';
 import '../repositories/user_repository.dart';
 import '../dtos/user_dto.dart';

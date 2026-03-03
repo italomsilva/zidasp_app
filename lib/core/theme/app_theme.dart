@@ -19,7 +19,6 @@ class AppColors {
   static const Color neutralBlue = Color(0xFF3498DB);
   static const Color neutralYellow = Color(0xFFF1C40F);
   
-  // Cores de Status
   static const Color success = healthGreen;
   static const Color warning = Color(0xFFF39C12);
   static const Color danger = shrimpAlert;

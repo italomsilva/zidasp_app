@@ -1,4 +1,3 @@
-// lib/data/mock_data.dart
 class MockData {
   static List<Map<String, dynamic>> ponds = [
     {

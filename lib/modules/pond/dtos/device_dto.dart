@@ -1,4 +1,3 @@
-// lib/modules/pond/dtos/device_dto.dart
 class DeviceDTO {
   final String id;
   final String name;

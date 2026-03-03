@@ -1,4 +1,3 @@
-// lib/core/di/core_module.dart
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';

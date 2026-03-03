@@ -1,4 +1,3 @@
-// lib/modules/tide/controllers/tide_controller.dart
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
 import '../repositories/tide_repository.dart';

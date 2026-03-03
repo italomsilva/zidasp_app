@@ -1,4 +1,3 @@
-// lib/core/di/di.dart
 import 'package:get_it/get_it.dart';
 import 'package:zidasp_app/modules/auth/auth_module.dart';
 import 'package:zidasp_app/modules/pond/pond_module.dart';

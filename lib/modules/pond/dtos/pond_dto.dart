@@ -1,4 +1,3 @@
-// lib/modules/pond/dtos/pond_dto.dart
 import 'package:zidasp_app/modules/pond/models/pond.dart';
 
 import 'device_dto.dart';

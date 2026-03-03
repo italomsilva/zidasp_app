@@ -1,4 +1,3 @@
-// lib/modules/auth/pages/profile_page.dart
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/core/di.dart';

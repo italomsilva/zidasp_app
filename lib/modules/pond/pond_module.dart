@@ -1,4 +1,3 @@
-// lib/core/di/modules/pond_module.dart
 import 'package:get_it/get_it.dart';
 import '../../../modules/pond/repositories/pond_repository.dart';
 import '../../../modules/pond/controllers/dashboard_controller.dart';

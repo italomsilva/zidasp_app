@@ -1,4 +1,3 @@
-// lib/modules/auth/dtos/company_dto.dart
 import '../models/company_model.dart';
 
 class CompanyDTO {

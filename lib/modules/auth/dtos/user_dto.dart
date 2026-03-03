@@ -1,4 +1,3 @@
-// lib/modules/auth/dtos/user_dto.dart
 import 'package:zidasp_app/modules/auth/models/user.dart';
 
 class UserDTO {

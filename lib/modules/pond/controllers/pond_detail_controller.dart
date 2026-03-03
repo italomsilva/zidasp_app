@@ -1,4 +1,3 @@
-// lib/modules/pond/controllers/pond_detail_controller.dart
 import 'package:signals/signals.dart';
 import '../repositories/pond_repository.dart';
 import '../dtos/pond_dto.dart';
