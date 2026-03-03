@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:signals/signals.dart';
-import '../repositories/user_repository.dart';
+import '../../../core/repositories/user_repository.dart';
 import '../dtos/user_dto.dart';
 import '../dtos/company_dto.dart';
 

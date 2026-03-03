@@ -1,51 +1,84 @@
+import 'package:zidasp_app/core/models/company.dart';
+
 class MockData {
   static List<Map<String, dynamic>> ponds = [
-    {
+{
       'id': '1',
       'name': 'Viveiro Principal',
-      'oxygen': '6.8',
-      'salinity': '28.5',
-      'temperature': '29.0',
+      'companyId': '1',
+      'oxygen': 7.2,
+      'temperature': 28.5,
+      'salinity': 25.0,
+      'ph': 7.8,
+      'transparency': 0.5,
+      'aeratorsOn': 2,
+      'aeratorsTotal': 4,
+      'pumpsOn': 1,
+      'pumpsTotal': 2,
       'hasAlert': false,
-      'aeratorsOn': 3,
-      'aeratorsTotal': 3,
-      'lastUpdate': DateTime.now().subtract(const Duration(minutes: 5)),
+      'isFavorite': true,
+      'isAutomatic': true,
+      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'devices': [],
     },
     {
       'id': '2',
       'name': 'Viveiro Norte',
-      'oxygen': '4.2',
-      'salinity': '31.2',
-      'temperature': '30.5',
+      'companyId': '1',
+      'oxygen': 6.8,
+      'temperature': 29.0,
+      'salinity': 26.5,
+      'ph': 8.0,
+      'transparency': 0.4,
+      'aeratorsOn': 3,
+      'aeratorsTotal': 4,
+      'pumpsOn': 2,
+      'pumpsTotal': 2,
       'hasAlert': true,
-      'aeratorsOn': 1,
-      'aeratorsTotal': 2,
-      'lastUpdate': DateTime.now().subtract(const Duration(minutes: 2)),
+      'isFavorite': false,
+      'isAutomatic': true,
+      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'devices': [],
     },
     {
       'id': '3',
       'name': 'Viveiro Sul',
-      'oxygen': '7.1',
-      'salinity': '27.8',
-      'temperature': '28.5',
+      'companyId': '1',
+      'oxygen': 7.1,
+      'temperature': 27.8,
+      'salinity': 24.5,
+      'ph': 7.6,
+      'transparency': 0.6,
+      'aeratorsOn': 1,
+      'aeratorsTotal': 3,
+      'pumpsOn': 0,
+      'pumpsTotal': 1,
       'hasAlert': false,
-      'aeratorsOn': 2,
-      'aeratorsTotal': 2,
-      'lastUpdate': DateTime.now().subtract(const Duration(minutes: 10)),
+      'isFavorite': true,
+      'isAutomatic': false,
+      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'devices': [],
     },
     {
       'id': '4',
-      'name': 'Viveiro Leste',
-      'oxygen': '5.9',
-      'salinity': '29.3',
-      'temperature': '31.2',
+      'name': 'Viveiro Oeste',
+      'companyId': '2',
+      'oxygen': 7.5,
+      'temperature': 28.2,
+      'salinity': 25.8,
+      'ph': 7.9,
+      'transparency': 0.55,
+      'aeratorsOn': 4,
+      'aeratorsTotal': 4,
+      'pumpsOn': 2,
+      'pumpsTotal': 2,
       'hasAlert': false,
-      'aeratorsOn': 2,
-      'aeratorsTotal': 3,
-      'lastUpdate': DateTime.now().subtract(const Duration(minutes: 15)),
-    },
-  ];
-  
+      'isFavorite': false,
+      'isAutomatic': true,
+      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'devices': [],
+    },  ];
+
   static List<Map<String, dynamic>> devices = [
     {
       'id': '1',
@@ -93,7 +126,7 @@ class MockData {
       'battery': '72%',
     },
   ];
-  
+
   static List<Map<String, dynamic>> users = [
     {
       'id': '1',
@@ -151,4 +184,22 @@ class MockData {
       'token': 'token_roberto',
     },
   ];
-  }
+
+  static List<Map<String, dynamic>> companies = [
+    {
+      'id': '1',
+      'name': 'Camarão do Vale',
+      'document': 'cnpj01',
+    },
+    {
+      'id': '2',
+      'name': 'Pescados Nordeste',
+      'document': 'cnpj02',
+    },
+    {
+      'id': '3',
+      'name': 'Acqua Cultura Brasil',
+      'document': 'cnpj03',
+    },
+  ];
+}

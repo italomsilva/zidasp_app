@@ -1,6 +1,6 @@
 import 'package:zidasp_app/data/mock_data.dart';
-import '../dtos/user_dto.dart';
-import '../dtos/company_dto.dart';
+import '../../modules/auth/dtos/user_dto.dart';
+import '../../modules/auth/dtos/company_dto.dart';
 
 class UserRepository {
   // Retorna DTO com dados completos

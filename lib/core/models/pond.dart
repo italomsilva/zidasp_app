@@ -9,7 +9,6 @@ class Pond {
     required this.companyId,
   });
   
-  // Se quiser criar a partir de JSON (quando API estiver pronta)
   factory Pond.fromJson(Map<String, dynamic> json) {
     return Pond(
       id: json['id'],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
-import '../repositories/tide_repository.dart';
+import '../../../core/repositories/tide_repository.dart';
 
 class TideController {
   final TideRepository _repository;

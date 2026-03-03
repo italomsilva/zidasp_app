@@ -1,4 +1,5 @@
-import '../models/company_model.dart';
+import 'package:zidasp_app/core/models/company.dart';
+
 
 class CompanyDTO {
   final String id;

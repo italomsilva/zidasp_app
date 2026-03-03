@@ -1,5 +1,5 @@
 import 'package:signals/signals.dart';
-import '../repositories/pond_repository.dart';
+import '../../../core/repositories/pond_repository.dart';
 import '../dtos/pond_dto.dart';
 import '../dtos/device_dto.dart';
 

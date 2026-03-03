@@ -3,7 +3,7 @@ import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/widgets/shared/custom_card.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/tide_controller.dart';
-import '../repositories/tide_repository.dart';
+import '../../../core/repositories/tide_repository.dart';
 
 class TidePage extends StatefulWidget {
   const TidePage({Key? key}) : super(key: key);

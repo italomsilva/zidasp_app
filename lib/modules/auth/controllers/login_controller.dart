@@ -1,6 +1,6 @@
 import 'package:signals/signals.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
-import 'package:zidasp_app/modules/auth/repositories/user_repository.dart';
+import 'package:zidasp_app/core/repositories/user_repository.dart';
 
 enum LoginStatus { initial, loading, success, error }
 

@@ -1,4 +1,4 @@
-import 'package:zidasp_app/modules/pond/models/pond.dart';
+import 'package:zidasp_app/core/models/pond.dart';
 
 import 'device_dto.dart';
 
@@ -48,60 +48,49 @@ class PondDTO {
     return Pond(id: id, name: name, companyId: companyId);
   }
 
-  static PondDTO mock(String pondId) {
-    // Dados diferentes baseados no ID
-    final index = int.tryParse(pondId) ?? 1;
-    final hasAlert = index == 2; // Viveiro 2 tem alerta
-    final isFavorite = index == 1; // Viveiro 1 é favorito
+factory PondDTO.fromJson(Map<String, dynamic> json) {
+  return PondDTO(
+    id: json['id'] ?? '',
+    name: json['name'] ?? '',
+    companyId: json['companyId'] ?? '',
+    
+    // Conversão segura para double
+    oxygen: json['oxygen'] is String 
+        ? double.parse(json['oxygen']) 
+        : (json['oxygen'] ?? 0.0).toDouble(),
+    temperature: json['temperature'] is String 
+        ? double.parse(json['temperature']) 
+        : (json['temperature'] ?? 0.0).toDouble(),
+    salinity: json['salinity'] is String 
+        ? double.parse(json['salinity']) 
+        : (json['salinity'] ?? 0.0).toDouble(),
+    ph: json['ph'] is String 
+        ? double.parse(json['ph']) 
+        : (json['ph'] ?? 0.0).toDouble(),
+    transparency: json['transparency'] is String 
+        ? double.parse(json['transparency']) 
+        : (json['transparency'] ?? 0.0).toDouble(),
+    
+    aeratorsOn: json['aeratorsOn'] ?? 0,
+    aeratorsTotal: json['aeratorsTotal'] ?? 0,
+    pumpsOn: json['pumpsOn'] ?? 0,
+    pumpsTotal: json['pumpsTotal'] ?? 0,
+    
+    hasAlert: json['hasAlert'] ?? false,
+    isFavorite: json['isFavorite'] ?? false,
+    isAutomatic: json['isAutomatic'] ?? false,
+    
+    // Tratamento especial para DateTime
+    lastUpdate: json['lastUpdate'] is DateTime 
+        ? json['lastUpdate']  // ← Se já for DateTime, usa direto
+        : (json['lastUpdate'] != null 
+            ? DateTime.parse(json['lastUpdate'].toString()) 
+            : DateTime.now()),
+        
+    devices: _mockDevices(json['id']),
+  );
+}
 
-    // Valores simulados
-    final oxygenValues = [6.8, 4.2, 7.1, 5.9, 6.2, 6.5];
-    final tempValues = [29.0, 30.5, 28.5, 31.2, 29.5, 28.8];
-    final salValues = [28.5, 31.2, 27.8, 29.3, 30.1, 28.9];
-    final phValues = [7.2, 7.0, 7.5, 7.1, 7.3, 7.4];
-    final transValues = [45.0, 35.0, 50.0, 40.0, 42.0, 47.0];
-    final aeratorsOnValues = [3, 1, 2, 2, 3, 2];
-    final pumpsOnValues = [2, 1, 2, 2, 2, 3];
-
-    final safeIndex = (index - 1) % oxygenValues.length;
-
-    return PondDTO(
-      id: pondId,
-      name:
-          'Viveiro ${index == 1
-              ? 'Principal'
-              : index == 2
-              ? 'Norte'
-              : index == 3
-              ? 'Sul'
-              : index == 4
-              ? 'Leste'
-              : index == 5
-              ? 'Oeste'
-              : 'Central'}',
-      companyId: index <= 3
-          ? '1'
-          : index <= 5
-          ? '2'
-          : '3',
-      oxygen: oxygenValues[safeIndex],
-      temperature: tempValues[safeIndex],
-      salinity: salValues[safeIndex],
-      ph: phValues[safeIndex],
-      transparency: transValues[safeIndex],
-      aeratorsOn: aeratorsOnValues[safeIndex],
-      aeratorsTotal: 3,
-      pumpsOn: pumpsOnValues[safeIndex],
-      pumpsTotal: 3,
-      hasAlert: hasAlert,
-      isFavorite: isFavorite,
-      isAutomatic: true,
-      lastUpdate: DateTime.now().subtract(
-        Duration(minutes: [5, 2, 15, 30, 10, 8][safeIndex]),
-      ),
-      devices: _mockDevices(pondId),
-    );
-  }
 
   static List<DeviceDTO> _mockDevices(String pondId) {
     return [

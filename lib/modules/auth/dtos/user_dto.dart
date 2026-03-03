@@ -1,4 +1,4 @@
-import 'package:zidasp_app/modules/auth/models/user.dart';
+import 'package:zidasp_app/core/models/user.dart';
 
 class UserDTO {
   final String id;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/core/theme/app_theme.dart';
 import 'package:zidasp_app/modules/pond/controllers/pond_detail_controller.dart';
-import 'package:zidasp_app/modules/pond/repositories/pond_repository.dart';
+import 'package:zidasp_app/core/repositories/pond_repository.dart';
 import 'package:zidasp_app/widgets/shared/custom_card.dart';
 import 'package:zidasp_app/modules/pond/widgets/device_controller.dart';
 
