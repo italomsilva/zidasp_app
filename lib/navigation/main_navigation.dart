@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:zidasp_app/core/di.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
+import 'package:zidasp_app/core/theme/app_theme.dart';
 import 'package:zidasp_app/modules/pond/pages/pond_list_page.dart';
 import 'package:zidasp_app/widgets/shared/theme_switcher.dart';
 import '../core/theme/theme_controller.dart';
@@ -31,9 +32,7 @@ class _MainNavigationState extends State<MainNavigation> {
   ];
   
   @override
-  Widget build(BuildContext context) {
-    final themeController = inject<ThemeController>();
-    
+  Widget build(BuildContext context) {    
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -47,9 +46,7 @@ class _MainNavigationState extends State<MainNavigation> {
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: themeController.isDarkMode.value 
-            ? Colors.white 
-            : const Color(0xFFFF6B6B),
+        selectedItemColor: AppColors.shrimpAlert,
         items: const [
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.shrimp),

@@ -9,21 +9,22 @@ final getIt = GetIt.instance;
 
 class PondModule {
   static void init() {
-      final pondRepo = getIt<PondRepository>();
-      final companyRepo = getIt<CompanyRepository>();
-      final sessionCtrl = getIt<SessionController>();
+      final pondRepository = getIt<PondRepository>();
+      final companyRepository = getIt<CompanyRepository>();
+      final sessionController = getIt<SessionController>();
 
     getIt.registerFactory<PondListController>(
       () => PondListController(
-        getIt<PondRepository>(),
-        getIt<CompanyRepository>(),
-        getIt<SessionController>(),
+        pondRepository,
+        companyRepository,
+        sessionController,
       ),
     );
+    
     getIt.registerFactoryParam<PondDetailController, String, void>(
       (pondId, _) => PondDetailController(
         pondId: pondId,
-        repository: getIt<PondRepository>(),
+        repository: pondRepository,
       ),
     );
   }

@@ -6,8 +6,10 @@ final getIt = GetIt.instance;
 
 class TideModule {
   static void init() {
+    final tideRepository = getIt<TideRepository>();
+
     getIt.registerFactory<TideController>(
-      () => TideController(getIt<TideRepository>()),
+      () => TideController(tideRepository),
     );
   }
 }

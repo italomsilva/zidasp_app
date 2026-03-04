@@ -9,14 +9,17 @@ final getIt = GetIt.instance;
 // auth_module.dart
 class AuthModule {
   static void init() {
+      final userRepository = getIt<UserRepository>();
+      final sessionController = getIt<SessionController>();
+
     getIt.registerFactory<ProfileController>(
-      () => ProfileController(getIt<UserRepository>()),
+      () => ProfileController(userRepository),
     );
 
     getIt.registerFactory<LoginController>(
       () => LoginController(
-        getIt<UserRepository>(), 
-        getIt<SessionController>(),
+        userRepository, 
+        sessionController,
       ),
     );
   }

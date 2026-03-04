@@ -42,6 +42,7 @@ class AppTheme {
       background: AppColors.lightBackground,
       surface: AppColors.lightSurface,
     ),
+    splashColor: AppColors.shrimpAlert.withAlpha(100),
   );
   
   static ThemeData darkTheme = ThemeData(
@@ -59,5 +60,6 @@ class AppTheme {
       background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
     ),
+    splashColor: AppColors.shrimpAlert.withAlpha(100)
   );
 }
