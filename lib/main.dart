@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/core/di.dart';
-import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/modules/auth/pages/login_page.dart';
 import 'core/theme/theme_controller.dart';
 import 'core/theme/app_theme.dart';
