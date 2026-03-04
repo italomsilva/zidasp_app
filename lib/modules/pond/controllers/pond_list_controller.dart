@@ -132,6 +132,8 @@ class PondListController {
         isAutomatic: pond.isAutomatic,
         lastUpdate: pond.lastUpdate,
         devices: pond.devices,
+        sensors: pond.sensors,
+        actuators: pond.actuators,
       );
 
       final updatedList = [...?ponds.value.value];

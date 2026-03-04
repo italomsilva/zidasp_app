@@ -39,6 +39,7 @@ class CustomCard extends StatelessWidget {
       color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       child: InkWell(
         onTap: onTap,
+        splashColor: isDark? AppColors.neutralBlue.withAlpha(15): AppColors.shrimpAlert.withAlpha(20),
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: padding ?? const EdgeInsets.all(16.0),

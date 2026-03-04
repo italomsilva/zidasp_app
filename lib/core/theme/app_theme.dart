@@ -6,19 +6,20 @@ class AppColors {
   static const Color lightSurface = Color(0xFFF5F5F5);
   static const Color lightText = Color(0xFF2C3E50);
   static const Color lightTextSecondary = Color(0xFF7F8C8D);
-  
+
   // Tema Escuro
   static const Color darkBackground = Color(0xFF121A2A); // Azul Petróleo
   static const Color darkSurface = Color(0xFF1A2436);
   static const Color darkText = Color(0xFFECF0F1);
   static const Color darkTextSecondary = Color(0xFFBDC3C7);
-  
+
   // Cores da Marca
   static const Color shrimpAlert = Color(0xFFFF7A6B); // Salmão/Coral
   static const Color healthGreen = Color(0xFF2ECC71); // Verde Esmeralda
   static const Color neutralBlue = Color(0xFF3498DB);
   static const Color neutralYellow = Color(0xFFF1C40F);
-  
+  static const Color neutralGray = lightTextSecondary;
+
   static const Color success = healthGreen;
   static const Color warning = Color(0xFFF39C12);
   static const Color danger = shrimpAlert;
@@ -42,9 +43,9 @@ class AppTheme {
       background: AppColors.lightBackground,
       surface: AppColors.lightSurface,
     ),
-    splashColor: AppColors.shrimpAlert.withAlpha(100),
+    splashColor: AppColors.shrimpAlert.withAlpha(20),
   );
-  
+
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.darkBackground,
@@ -60,6 +61,6 @@ class AppTheme {
       background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
     ),
-    splashColor: AppColors.shrimpAlert.withAlpha(100)
+    splashColor: AppColors.shrimpAlert.withAlpha(10),
   );
 }

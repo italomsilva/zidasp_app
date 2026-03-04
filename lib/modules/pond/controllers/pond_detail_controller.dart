@@ -6,15 +6,15 @@ import '../../../core/dtos/device_dto.dart';
 class PondDetailController {
   final PondRepository _repository;
   final String pondId;
-  
+
   // Signal com o DTO completo
   final pondDTO = signal<PondDTO?>(null);
-  
+
   // Signals de UI
   final isLoading = signal<bool>(false);
   final isSaving = signal<bool>(false);
   final error = signal<String?>(null);
-  
+
   // Computed para dados específicos
   late final oxygen = computed(() => pondDTO.value?.oxygen ?? 0);
   late final temperature = computed(() => pondDTO.value?.temperature ?? 0);
@@ -28,36 +28,36 @@ class PondDetailController {
   late final hasAlert = computed(() => pondDTO.value?.hasAlert ?? false);
   late final isAutomatic = computed(() => pondDTO.value?.isAutomatic ?? false);
   late final isFavorite = computed(() => pondDTO.value?.isFavorite ?? false);
-  
+
   // Lista de dispositivos
   late final devices = computed(() => pondDTO.value?.devices ?? []);
-  
+
   // Sensores (filtrados por tipo)
   late final sensors = computed(() {
     return devices.value.where((d) => d.type == 'Sensor').toList();
   });
-  
+
   // Aeradores (filtrados por tipo)
   late final aeradores = computed(() {
     return devices.value.where((d) => d.type == 'Aerador').toList();
   });
-  
+
   // Bombas (filtradas por tipo)
   late final bombas = computed(() {
     return devices.value.where((d) => d.type == 'Bomba').toList();
   });
-  
+
   PondDetailController({
     required this.pondId,
     required PondRepository repository,
   }) : _repository = repository {
     loadPondDetails();
   }
-  
+
   Future<void> loadPondDetails() async {
     isLoading.value = true;
     error.value = null;
-    
+
     try {
       final result = await _repository.getPondDetails(pondId);
       pondDTO.value = result;
@@ -67,11 +67,11 @@ class PondDetailController {
       isLoading.value = false;
     }
   }
-  
+
   Future<void> toggleDevice(String deviceId, bool isOn) async {
     // Atualização otimista
     _updateDeviceLocally(deviceId, isOn);
-    
+
     try {
       await _repository.toggleDevice(pondId, deviceId, isOn);
     } catch (e) {
@@ -80,10 +80,10 @@ class PondDetailController {
       error.value = e.toString();
     }
   }
-  
+
   void _updateDeviceLocally(String deviceId, bool isOn) {
     if (pondDTO.value == null) return;
-    
+
     final updatedDevices = pondDTO.value!.devices.map((device) {
       if (device.id == deviceId) {
         return DeviceDTO(
@@ -98,7 +98,7 @@ class PondDetailController {
       }
       return device;
     }).toList();
-    
+
     // Recalcula totais
     final aeratorsCount = updatedDevices
         .where((d) => d.type == 'Aerador' && d.isOn)
@@ -106,7 +106,7 @@ class PondDetailController {
     final pumpsCount = updatedDevices
         .where((d) => d.type == 'Bomba' && d.isOn)
         .length;
-    
+
     pondDTO.value = PondDTO(
       id: pondDTO.value!.id,
       name: pondDTO.value!.name,
@@ -125,14 +125,16 @@ class PondDetailController {
       isAutomatic: pondDTO.value!.isAutomatic,
       lastUpdate: DateTime.now(),
       devices: updatedDevices,
+      sensors: pondDTO.value!.sensors,
+      actuators: pondDTO.value!.actuators,
     );
   }
-  
+
   Future<void> toggleFavorite() async {
     if (pondDTO.value == null) return;
-    
+
     final newValue = !pondDTO.value!.isFavorite;
-    
+
     // Atualização otimista
     pondDTO.value = PondDTO(
       id: pondDTO.value!.id,
@@ -152,17 +154,19 @@ class PondDetailController {
       isAutomatic: pondDTO.value!.isAutomatic,
       lastUpdate: DateTime.now(),
       devices: pondDTO.value!.devices,
+      sensors: pondDTO.value!.sensors,
+      actuators: pondDTO.value!.actuators,
     );
-    
+
     // Aqui você chamaria a API para favoritar
     // await _repository.toggleFavorite(pondId);
   }
-  
+
   Future<void> toggleAutomaticMode() async {
     if (pondDTO.value == null) return;
-    
+
     final newValue = !pondDTO.value!.isAutomatic;
-    
+
     pondDTO.value = PondDTO(
       id: pondDTO.value!.id,
       name: pondDTO.value!.name,
@@ -181,8 +185,10 @@ class PondDetailController {
       isAutomatic: newValue,
       lastUpdate: DateTime.now(),
       devices: pondDTO.value!.devices,
+      sensors: pondDTO.value!.sensors,
+      actuators: pondDTO.value!.actuators,
     );
-    
+
     await _repository.updateSettings(pondId, {'isAutomatic': newValue});
   }
 }

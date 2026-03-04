@@ -1,5 +1,3 @@
-import 'package:zidasp_app/core/models/company.dart';
-
 class MockData {
   static List<Map<String, dynamic>> ponds = [
     {
@@ -20,6 +18,8 @@ class MockData {
       'isAutomatic': true,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
+      'sensors': sensors,
+      'actuators': actuators,
     },
     {
       'id': '2',
@@ -39,6 +39,8 @@ class MockData {
       'isAutomatic': true,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
+      'sensors': sensors,
+      'actuators': actuators,
     },
     {
       'id': '5',
@@ -58,6 +60,8 @@ class MockData {
       'isAutomatic': false,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
+      'sensors': sensors,
+      'actuators': actuators,
     },
     {
       'id': '6',
@@ -77,6 +81,8 @@ class MockData {
       'isAutomatic': false,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
+      'sensors': sensors,
+      'actuators': actuators,
     },
     {
       'id': '3',
@@ -96,6 +102,8 @@ class MockData {
       'isAutomatic': false,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
+      'sensors': sensors,
+      'actuators': actuators,
     },
     {
       'id': '4',
@@ -115,6 +123,8 @@ class MockData {
       'isAutomatic': true,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
+      'sensors': sensors,
+      'actuators': actuators,
     },
   ];
 
@@ -228,5 +238,16 @@ class MockData {
     {'id': '1', 'name': 'Camarão do Vale', 'document': 'cnpj01'},
     {'id': '2', 'name': 'Pescados Nordeste', 'document': 'cnpj02'},
     {'id': '3', 'name': 'Acqua Cultura Brasil', 'document': 'cnpj03'},
+  ];
+
+  static List<Map<String, dynamic>> sensors = [
+    {'id': '1', 'type': 'Oxygen', 'value': 7.2, 'unity': 'mg/L'},
+    {'id': '2', 'type': 'Salinidade', 'value': 25.0, 'unity': 'ppt'},
+    {'id': '3', 'type': 'Temperatura', 'value': 28.5, 'unity': '°C'},
+  ];
+
+  static List<Map<String, dynamic>> actuators = [
+    {'name': 'Bomba', 'active': false},
+    {'name': 'Bomba', 'active': false},
   ];
 }

@@ -1,4 +1,7 @@
+import 'package:zidasp_app/core/dtos/actuator_dto.dart';
+import 'package:zidasp_app/core/dtos/sensor_dto.dart';
 import 'package:zidasp_app/core/models/pond.dart';
+import 'package:zidasp_app/data/mock_data.dart';
 
 import 'device_dto.dart';
 
@@ -22,6 +25,8 @@ class PondDTO {
   final bool isAutomatic;
   final DateTime lastUpdate;
   final List<DeviceDTO> devices;
+  final List<SensorDTO> sensors;
+  final List<ActuatorDTO> actuators;
 
   PondDTO({
     required this.id,
@@ -41,6 +46,8 @@ class PondDTO {
     required this.isAutomatic,
     required this.lastUpdate,
     required this.devices,
+    required this.sensors,
+    required this.actuators,
   });
 
   // Converte para Model (simples)
@@ -88,6 +95,8 @@ factory PondDTO.fromJson(Map<String, dynamic> json) {
             : DateTime.now()),
         
     devices: _mockDevices(json['id']),
+    sensors: MockData.sensors.map((e) => SensorDTO.fromJson(e)).toList(),
+    actuators: MockData.sensors.map((e) => ActuatorDTO.fromJson(e)).toList(),
   );
 }
 
