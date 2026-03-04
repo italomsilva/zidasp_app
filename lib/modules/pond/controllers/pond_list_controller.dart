@@ -1,23 +1,24 @@
 import 'package:signals/signals.dart';
 import 'package:zidasp_app/core/models/company.dart';
 import 'package:zidasp_app/core/repositories/company_repository.dart';
+import 'package:zidasp_app/core/sesssion/models/company_session.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
-import 'package:zidasp_app/modules/pond/dtos/pond_dto.dart';
+import 'package:zidasp_app/core/dtos/pond_dto.dart';
 import '../../../core/repositories/pond_repository.dart';
 
-class DashboardController {
+class PondListController {
   final PondRepository _pondRepository;
   final CompanyRepository _companyRepository;
   final SessionController _sessionController;
 
-  DashboardController(
+  PondListController(
     this._pondRepository,
     this._companyRepository,
     this._sessionController,
   );
 
   // Signals
-  final companies = signal<List<Company?>>([]);
+  final companies = signal<List<CompanySession?>>([]);
   final ponds = asyncSignal<List<PondDTO>>(AsyncState.data([]));
   final selectedCompanyId = signal<String?>(null);
   final isSwitchingCompany = signal<bool>(false);
@@ -33,21 +34,24 @@ class DashboardController {
 
   // Initialize
   Future<void> initialize() async {
+    ponds.set(AsyncState.loading());
     final user = await _sessionController.loadUser();
     if (user == null) {
       ponds.set(AsyncState.error('Problema de Usuário, faça login novamente'));
       return;
     }
-    final userCompanies = await _companyRepository.getUserCompanies(user.id);
 
+    List<CompanySession> userCompanies = user.companies;
+    if (user.companies.isEmpty) {
+      userCompanies = await _companyRepository.getUserCompaniesSession(user.id);
+      await _sessionController.saveCompanies(userCompanies);
+    }
     companies.value = userCompanies;
-
     if (userCompanies.isEmpty) {
       ponds.set(AsyncState.error('Nenhuma empresa vinculada'));
       return;
     }
 
-    // Acesso seguro ao ID da primeira empresa
     selectedCompanyId.value = userCompanies.first?.id;
 
     if (selectedCompanyId.value != null) {
@@ -92,7 +96,6 @@ class DashboardController {
         pondsDetails.add(details);
       }
 
-
       if (pondsDetails.isEmpty && simplePonds.isNotEmpty) {
         throw Exception('Não foi possível carregar detalhes de nenhum viveiro');
       }
@@ -105,7 +108,6 @@ class DashboardController {
 
   // Alternar favorito (atualização otimista)
   void toggleFavorite(String pondId) {
-
     final pondList = ponds.value.value;
     final index = pondList?.indexWhere((p) => p.id == pondId);
 

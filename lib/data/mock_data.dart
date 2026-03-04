@@ -2,7 +2,7 @@ import 'package:zidasp_app/core/models/company.dart';
 
 class MockData {
   static List<Map<String, dynamic>> ponds = [
-{
+    {
       'id': '1',
       'name': 'Viveiro Principal',
       'companyId': '1',
@@ -37,6 +37,44 @@ class MockData {
       'hasAlert': true,
       'isFavorite': false,
       'isAutomatic': true,
+      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'devices': [],
+    },
+    {
+      'id': '5',
+      'name': 'Viveiro Testando 5',
+      'companyId': '1',
+      'oxygen': 7.1,
+      'temperature': 27.8,
+      'salinity': 24.5,
+      'ph': 7.6,
+      'transparency': 0.6,
+      'aeratorsOn': 1,
+      'aeratorsTotal': 3,
+      'pumpsOn': 0,
+      'pumpsTotal': 1,
+      'hasAlert': false,
+      'isFavorite': true,
+      'isAutomatic': false,
+      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'devices': [],
+    },
+    {
+      'id': '6',
+      'name': 'Viveiro do  Pelado',
+      'companyId': '1',
+      'oxygen': 7.1,
+      'temperature': 27.8,
+      'salinity': 24.5,
+      'ph': 7.6,
+      'transparency': 0.6,
+      'aeratorsOn': 1,
+      'aeratorsTotal': 3,
+      'pumpsOn': 0,
+      'pumpsTotal': 1,
+      'hasAlert': false,
+      'isFavorite': true,
+      'isAutomatic': false,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
     },
@@ -77,7 +115,8 @@ class MockData {
       'isAutomatic': true,
       'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
       'devices': [],
-    },  ];
+    },
+  ];
 
   static List<Map<String, dynamic>> devices = [
     {
@@ -186,20 +225,8 @@ class MockData {
   ];
 
   static List<Map<String, dynamic>> companies = [
-    {
-      'id': '1',
-      'name': 'Camarão do Vale',
-      'document': 'cnpj01',
-    },
-    {
-      'id': '2',
-      'name': 'Pescados Nordeste',
-      'document': 'cnpj02',
-    },
-    {
-      'id': '3',
-      'name': 'Acqua Cultura Brasil',
-      'document': 'cnpj03',
-    },
+    {'id': '1', 'name': 'Camarão do Vale', 'document': 'cnpj01'},
+    {'id': '2', 'name': 'Pescados Nordeste', 'document': 'cnpj02'},
+    {'id': '3', 'name': 'Acqua Cultura Brasil', 'document': 'cnpj03'},
   ];
 }

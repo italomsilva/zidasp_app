@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:zidasp_app/widgets/shared/custom_card.dart';
 import '../../../core/theme/app_theme.dart';
-import '../dtos/pond_dto.dart';
+import '../../../core/dtos/pond_dto.dart';
 
 class PondCard extends StatelessWidget {
   final PondDTO pond;

@@ -1,7 +1,7 @@
 import 'package:signals/signals.dart';
 import '../../../core/repositories/pond_repository.dart';
-import '../dtos/pond_dto.dart';
-import '../dtos/device_dto.dart';
+import '../../../core/dtos/pond_dto.dart';
+import '../../../core/dtos/device_dto.dart';
 
 class PondDetailController {
   final PondRepository _repository;
