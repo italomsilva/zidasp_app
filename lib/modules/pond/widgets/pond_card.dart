@@ -7,15 +7,11 @@ import '../../../core/dtos/pond_dto.dart';
 class PondCard extends StatelessWidget {
   final PondDTO pond;
   final VoidCallback onTap;
-  final VoidCallback? onFavoriteToggle;
-  final VoidCallback? onRefresh;
 
   const PondCard({
     Key? key,
     required this.pond,
     required this.onTap,
-    this.onFavoriteToggle,
-    this.onRefresh,
   }) : super(key: key);
 
   @override
@@ -39,9 +35,12 @@ class PondCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Wrap(
+              spacing: 12,
               children: [
                 ...pond.sensors.map((sensor) {
-                  final Color color = sensor.value < 15 ? AppColors.danger : AppColors.healthGreen;
+                  final Color color = sensor.value < 15
+                      ? AppColors.danger
+                      : AppColors.healthGreen;
                   return Container(
                     width: 70, // Largura fixa em vez de Expanded
                     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -70,9 +69,10 @@ class PondCard extends StatelessWidget {
             const SizedBox(height: 8),
 
             Wrap(
+              spacing: 12,
               children: [
-                ...pond.actuators.map(
-                  (actuator) => Row(
+                ...pond.actuators.map((actuator) {
+                  return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
@@ -91,13 +91,12 @@ class PondCard extends StatelessWidget {
                         style: const TextStyle(fontSize: 12),
                       ),
                     ],
-                  ),
-                ),
+                  );
+                }),
               ],
             ),
 
             const SizedBox(height: 8),
-            // Última atualização
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

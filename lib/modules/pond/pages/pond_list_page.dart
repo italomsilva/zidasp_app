@@ -156,9 +156,6 @@ class _PondListPageState extends State<PondListPage> {
                                 ),
                               );
                             },
-                            onFavoriteToggle: () =>
-                                controller.toggleFavorite(pond.id),
-                            onRefresh: _handleRefresh,
                           ),
                         );
                       }, childCount: pondlist.length),

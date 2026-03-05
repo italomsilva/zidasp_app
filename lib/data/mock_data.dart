@@ -1,3 +1,6 @@
+
+import 'dart:math';
+
 class MockData {
   static List<Map<String, dynamic>> ponds = [
     {
@@ -247,7 +250,7 @@ class MockData {
   ];
 
   static List<Map<String, dynamic>> actuators = [
-    {'name': 'Bomba', 'active': false},
-    {'name': 'Bomba', 'active': false},
+    {'type': 'Bomba','name': 'Bomba Principal', 'active': Random.secure().nextBool()},
+    {'type': 'Aerador','name': 'Aerador Principal', 'active': Random.secure().nextBool()},
   ];
 }

@@ -1,5 +1,4 @@
 import 'package:signals/signals.dart';
-import 'package:zidasp_app/core/models/company.dart';
 import 'package:zidasp_app/core/repositories/company_repository.dart';
 import 'package:zidasp_app/core/sesssion/models/company_session.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
@@ -80,65 +79,19 @@ class PondListController {
     ponds.set(AsyncState.loading());
 
     try {
-      final simplePonds = await _pondRepository.getPondsByCompany(
+      final pondList = await _pondRepository.getPondsByCompany(
         selectedCompanyId.value!,
       );
 
-      if (simplePonds.isEmpty) {
+      if (pondList.isEmpty) {
         ponds.set(AsyncState.data([]));
         return;
       }
 
-      final pondsDetails = <PondDTO>[];
-
-      for (var simplePond in simplePonds) {
-        final details = await _pondRepository.getPondDetails(simplePond.id);
-        pondsDetails.add(details);
-      }
-
-      if (pondsDetails.isEmpty && simplePonds.isNotEmpty) {
-        throw Exception('Não foi possível carregar detalhes de nenhum viveiro');
-      }
-
-      ponds.set(AsyncState.data(pondsDetails));
+      ponds.set(AsyncState.data(pondList));
     } catch (e) {
       ponds.set(AsyncState.error('Ocorreu um problema, tente novamente'));
     }
   }
 
-  // Alternar favorito (atualização otimista)
-  void toggleFavorite(String pondId) {
-    final pondList = ponds.value.value;
-    final index = pondList?.indexWhere((p) => p.id == pondId);
-
-    if (index != -1 && index != null) {
-      final pond = pondList![index];
-
-      final updatedPond = PondDTO(
-        id: pond.id,
-        name: pond.name,
-        companyId: pond.companyId,
-        oxygen: pond.oxygen,
-        temperature: pond.temperature,
-        salinity: pond.salinity,
-        ph: pond.ph,
-        transparency: pond.transparency,
-        aeratorsOn: pond.aeratorsOn,
-        aeratorsTotal: pond.aeratorsTotal,
-        pumpsOn: pond.pumpsOn,
-        pumpsTotal: pond.pumpsTotal,
-        hasAlert: pond.hasAlert,
-        isFavorite: !pond.isFavorite,
-        isAutomatic: pond.isAutomatic,
-        lastUpdate: pond.lastUpdate,
-        devices: pond.devices,
-        sensors: pond.sensors,
-        actuators: pond.actuators,
-      );
-
-      final updatedList = [...?ponds.value.value];
-      updatedList[index] = updatedPond;
-      ponds.set(AsyncState.data(updatedList));
-    }
-  }
 }

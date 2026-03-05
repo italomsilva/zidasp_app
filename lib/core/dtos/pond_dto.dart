@@ -96,7 +96,7 @@ factory PondDTO.fromJson(Map<String, dynamic> json) {
         
     devices: _mockDevices(json['id']),
     sensors: MockData.sensors.map((e) => SensorDTO.fromJson(e)).toList(),
-    actuators: MockData.sensors.map((e) => ActuatorDTO.fromJson(e)).toList(),
+    actuators: MockData.actuators.map((e) => ActuatorDTO.fromJson(e)).toList(),
   );
 }
 
