@@ -1,381 +1,572 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:zidasp_app/core/di.dart';
+import 'package:zidasp_app/core/dtos/device_dto.dart';
+import 'package:zidasp_app/core/dtos/sensor_dto.dart';
 import 'package:zidasp_app/core/theme/app_theme.dart';
 import 'package:zidasp_app/modules/pond/controllers/pond_detail_controller.dart';
-import 'package:zidasp_app/core/repositories/pond_repository.dart';
 import 'package:zidasp_app/widgets/shared/custom_card.dart';
 import 'package:zidasp_app/modules/pond/widgets/device_controller.dart';
 
 class PondDetailPage extends StatefulWidget {
   final String pondId;
   final String pondName;
-  
-  const PondDetailPage({
-    Key? key,
-    required this.pondId,
-    required this.pondName,
-  }) : super(key: key);
-  
+
+  const PondDetailPage({Key? key, required this.pondId, required this.pondName})
+    : super(key: key);
+
   @override
   State<PondDetailPage> createState() => _PondDetailPageState();
 }
 
 class _PondDetailPageState extends State<PondDetailPage> {
-  late final controller = PondDetailController(
-    pondId: widget.pondId,
-    repository: PondRepository(),
-  );
-  
+  late final PondDetailController controller = inject<PondDetailController>();
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollToTop = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 400 && !_showScrollToTop) {
+        setState(() => _showScrollToTop = true);
+      } else if (_scrollController.offset <= 400 && _showScrollToTop) {
+        setState(() => _showScrollToTop = false);
+      }
+    });
+  }
+
+  Future<void> _initialize() async {
+    await controller.initialize(widget.pondId);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.pondName),
-        actions: [
-          // Botão de favoritar
-          Watch(
-            (context) => IconButton(
-              icon: Icon(
-                controller.isFavorite.value 
-                    ? Icons.favorite 
-                    : Icons.favorite_border,
-                color: controller.isFavorite.value 
-                    ? Colors.red 
-                    : null,
-              ),
-              onPressed: controller.toggleFavorite,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.bar_chart),
-            onPressed: () {
-              // Navegar para gráficos
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () {
-              // Navegar para histórico
-            },
-          ),
-        ],
-      ),
-      body: Watch(
-        (context) {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          
-          if (controller.error.value != null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Erro: ${controller.error.value}'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: controller.loadPondDetails,
-                    child: const Text('Tentar novamente'),
+      body: Stack(
+        children: [
+          RefreshIndicator(
+            onRefresh: controller.loadPondDetails,
+            color: AppColors.shrimpAlert,
+            backgroundColor: Theme.of(context).cardColor,
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.bar_chart),
+                      onPressed: () {
+                        // Navegar para gráficos
+                      },
+                      tooltip: 'Gráficos',
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.history),
+                      onPressed: () {
+                        // Navegar para histórico
+                      },
+                      tooltip: 'Histórico',
+                    ),
+                  ],
+                ),
+
+                // Conteúdo principal
+                Watch(
+                  (context) => controller.pond.get().map(
+                    error: (err) => SliverFillRemaining(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: AppColors.shrimpAlert.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.error_outline,
+                                  size: 40,
+                                  color: AppColors.shrimpAlert,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                'Ops! Algo deu errado',
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                err,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.grey.shade600),
+                              ),
+                              const SizedBox(height: 24),
+                              ElevatedButton(
+                                onPressed: () => controller.loadPondDetails(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.shrimpAlert,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                                child: const Text('Tentar novamente'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    loading: () => const SliverFillRemaining(
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    data: (value) => SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          // Card de sensores
+                          _buildSensorsCard(context),
+
+                          const SizedBox(height: 16),
+
+                          // Card com informações do viveiro
+                          _buildInfoCard(context),
+
+                          const SizedBox(height: 16),
+
+                          // Controles de Dispositivos
+                          _buildDeviceControls(context),
+
+                          const SizedBox(height: 16),
+                        ]),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            );
-          }
-          
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Status Principal
-                _buildMainStatusCard(context),
-                
-                const SizedBox(height: 16),
-                
-                // Controles de Dispositivos
-                _buildDeviceControls(context),
-                
-                const SizedBox(height: 16),
-                
-                // Sensores
-                _buildSensorsCard(context),
-                
-                const SizedBox(height: 16),
-                
-                // Configurações
-                _buildSettingsCard(context),
+                ),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
-  
-  Widget _buildMainStatusCard(BuildContext context) {
-    return CustomCard(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildStatusItem(
-                context,
-                label: 'Oxigênio',
-                value: '${controller.oxygen.value.toStringAsFixed(1)} mg/L',
-                isCritical: controller.oxygen.value < 5.0,
-              ),
-              _buildStatusItem(
-                context,
-                label: 'Temperatura',
-                value: '${controller.temperature.value.toStringAsFixed(1)}°C',
-                isWarning: controller.temperature.value < 28 || 
-                           controller.temperature.value > 32,
-              ),
-              _buildStatusItem(
-                context,
-                label: 'Salinidade',
-                value: '${controller.salinity.value.toStringAsFixed(1)} ppt',
-                isWarning: controller.salinity.value < 25 || 
-                           controller.salinity.value > 35,
-              ),
-            ],
           ),
-          const Divider(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'pH: ${controller.ph.value.toStringAsFixed(1)}',
-                style: Theme.of(context).textTheme.bodyLarge,
+
+          // Botão flutuante de scroll to top
+          if (_showScrollToTop)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _showScrollToTop ? 1 : 0,
+                child: FloatingActionButton.small(
+                  onPressed: () {
+                    _scrollController.animateTo(
+                      0,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  backgroundColor: AppColors.shrimpAlert,
+                  foregroundColor: Colors.white,
+                  child: const Icon(Icons.arrow_upward),
+                ),
               ),
-              Text(
-                'Transparência: ${controller.transparency.value.toStringAsFixed(0)} cm',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
+            ),
         ],
       ),
     );
   }
-  
-  Widget _buildStatusItem(
+
+  // Card com informações básicas do viveiro
+  Widget _buildInfoCard(BuildContext context) {
+    return _buildExpandableCard(
+      context,
+      title: 'Informações do Viveiro',
+      icon: Icons.info_outline,
+      iconColor: AppColors.shrimpAlert,
+      initiallyExpanded: false, 
+      children: [
+        _buildInfoItem(
+          context,
+          label: 'ID',
+          value: widget.pondId,
+          icon: Icons.tag,
+        ),
+        _buildInfoItem(
+          context,
+          label: 'Nome',
+          value: widget.pondName,
+          icon: FontAwesomeIcons.tarpDroplet,
+        ),
+        _buildInfoItem(
+          context,
+          label: 'Empresa',
+          value: controller.companyName.value,
+          icon: Icons.business,
+        ),
+      ],
+    );
+  }
+
+  // Card de sensores
+  Widget _buildSensorsCard(BuildContext context) {
+    return _buildExpandableCard(
+      context,
+      title: 'Sensores',
+      icon: Icons.sensors,
+      iconColor: AppColors.neutralBlue,
+      initiallyExpanded: true,
+      children: [
+        Watch((context) {
+          final sensors = controller.sensors;
+          if (sensors.isEmpty)
+            return const Center(child: Text('Nenhum sensor encontrado'));
+          return Column(
+            children: sensors
+                .map(
+                  (sensor) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildSensorTile(sensor),
+                  ),
+                )
+                .toList(),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildSensorTile(SensorDTO sensor) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _getSensorIconColor(sensor.type).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _getSensorIcon(sensor.type),
+              color: _getSensorIconColor(sensor.type),
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  sensor.type,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "${sensor.value} ${sensor.unity}",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _getSensorValueColor(sensor.type, 1.12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(Icons.check_circle, color: Colors.green, size: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeviceControls(BuildContext context) {
+    return _buildExpandableCard(
+      context,
+      title: 'Controle de Dispositivos',
+      icon: Icons.power_settings_new,
+      iconColor: AppColors.shrimpAlert,
+      children: [
+        // Aqui vai o conteúdo atual de aeradores e bombas que você já tem
+        Watch((context) {
+          final aeradores = controller.actuators.where(
+            (act) => act.type == 'Aerador',
+          );
+          if (aeradores.isEmpty) return const SizedBox.shrink();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.shrimpAlert,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Aeradores',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    Watch(
+                      (context) => Text(
+                        '${controller.aeratorsOn.value}/${controller.aeratorsTotal.value} ativos',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.2,
+                children: aeradores.map((device) {
+                  return DeviceController(
+                    deviceName: device.name,
+                    deviceType: device.type,
+                    isOn: device.active,
+                    onChanged: (value) {
+                      //////impl
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+            ],
+          );
+        }),
+
+        // Bombas
+        Watch((context) {
+          final bombas = controller.actuators.where(
+            (act) => act.type == 'Bomba',
+          );
+          if (bombas.isEmpty) return const SizedBox.shrink();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 8),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.neutralBlue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Bombas',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    const Spacer(),
+                    Watch(
+                      (context) => Text(
+                        '${controller.pumpsOn.value}/${controller.pumpsTotal.value} ativos',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.2,
+                children: bombas.map((device) {
+                  return DeviceController(
+                    deviceName: device.name,
+                    deviceType: device.type,
+                    isOn: device.active,
+                    onChanged: (value) {
+                      //////impl
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+
+  // Card de configurações
+  // Widgets auxiliares
+  Widget _buildInfoItem(
     BuildContext context, {
     required String label,
     required String value,
-    bool isCritical = false,
-    bool isWarning = false,
+    required IconData icon,
   }) {
-    Color color = AppColors.healthGreen;
-    if (isCritical) color = AppColors.shrimpAlert;
-    if (isWarning) color = AppColors.neutralYellow;
-    
-    return Column(
+    return Row(
       children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+        Icon(icon, size: 16, color: Colors.grey.shade600),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
       ],
     );
   }
-  
-  Widget _buildDeviceControls(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8, bottom: 8),
-          child: Text(
-            'Controle de Dispositivos',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        
-        // Aeradores
-        Watch(
-          (context) {
-            final aeradores = controller.aeradores.value;
-            if (aeradores.isEmpty) return const SizedBox.shrink();
-            
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Aeradores', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.2,
-                  children: aeradores.map((device) {
-                    return DeviceController(
-                      deviceName: device.name,
-                      deviceType: device.type,
-                      isOn: device.isOn,
-                      power: device.power,
-                      onChanged: (value) {
-                        controller.toggleDevice(device.id, value);
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
-            );
-          },
-        ),
-        
-        const SizedBox(height: 16),
-        
-        // Bombas
-        Watch(
-          (context) {
-            final bombas = controller.bombas.value;
-            if (bombas.isEmpty) return const SizedBox.shrink();
-            
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Bombas', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.2,
-                  children: bombas.map((device) {
-                    return DeviceController(
-                      deviceName: device.name,
-                      deviceType: device.type,
-                      isOn: device.isOn,
-                      power: device.power,
-                      onChanged: (value) {
-                        controller.toggleDevice(device.id, value);
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
-            );
-          },
-        ),
-      ],
-    );
+
+  // Funções auxiliares para cores
+  Color _getOxygenColor(double value) {
+    if (value < 5.0) return AppColors.shrimpAlert;
+    if (value < 6.0) return AppColors.neutralYellow;
+    return AppColors.healthGreen;
   }
-  
-  Widget _buildSensorsCard(BuildContext context) {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Sensores Conectados',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          
-          const SizedBox(height: 12),
-          
-          Watch(
-            (context) {
-              final sensors = controller.sensors.value;
-              
-              return Column(
-                children: sensors.map((sensor) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          sensor.isOn ? Icons.check_circle : Icons.error,
-                          color: sensor.isOn 
-                              ? AppColors.healthGreen 
-                              : AppColors.shrimpAlert,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(sensor.name),
-                        ),
-                        if (sensor.batteryLevel != null)
-                          Text(
-                            '${sensor.batteryLevel}%',
-                            style: TextStyle(
-                              color: sensor.batteryLevel! < 50 
-                                  ? AppColors.shrimpAlert 
-                                  : null,
-                            ),
-                          ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+
+  Color _getTemperatureColor(double value) {
+    if (value < 28 || value > 32) return AppColors.shrimpAlert;
+    if (value < 29 || value > 31) return AppColors.neutralYellow;
+    return AppColors.healthGreen;
   }
-  
-  Widget _buildSettingsCard(BuildContext context) {
+
+  Color _getSalinityColor(double value) {
+    if (value < 25 || value > 35) return AppColors.shrimpAlert;
+    if (value < 27 || value > 33) return AppColors.neutralYellow;
+    return AppColors.healthGreen;
+  }
+
+  IconData _getSensorIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'oxigênio':
+      case 'oxigenio':
+        return Icons.water_drop;
+      case 'temperatura':
+        return Icons.thermostat;
+      case 'salinidade':
+        return Icons.water;
+      case 'ph':
+        return Icons.science;
+      default:
+        return Icons.sensors;
+    }
+  }
+
+  Color _getSensorIconColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'oxigênio':
+      case 'oxigenio':
+        return AppColors.neutralBlue;
+      case 'temperatura':
+        return AppColors.shrimpAlert;
+      case 'salinidade':
+        return AppColors.healthGreen;
+      case 'ph':
+        return AppColors.neutralYellow;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getSensorValueColor(String type, double value) {
+    switch (type.toLowerCase()) {
+      case 'oxigênio':
+      case 'oxigenio':
+        return _getOxygenColor(value);
+      case 'temperatura':
+        return _getTemperatureColor(value);
+      case 'salinidade':
+        return _getSalinityColor(value);
+      default:
+        return Colors.black87;
+    }
+  }
+
+  Widget _buildExpandableCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required List<Widget> children,
+    bool initiallyExpanded = false,
+  }) {
     return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Configurações',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+      padding: EdgeInsets
+          .zero, // Remove o padding interno do card para o Tile ocupar tudo
+      child: Theme(
+        // Remove as linhas que o ExpansionTile coloca automaticamente
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded,
+          maintainState: true,
+          title: Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              shape: BoxShape.circle,
             ),
+            child: Icon(icon, color: iconColor, size: 20),
           ),
-          
-          const SizedBox(height: 12),
-          
-          Watch(
-            (context) => SwitchListTile(
-              title: const Text('Notificações de Alerta'),
-              subtitle: const Text('Receber alertas quando houver problemas'),
-              value: true,
-              onChanged: (value) {},
-            ),
-          ),
-          
-          Watch(
-            (context) => SwitchListTile(
-              title: const Text('Modo Automático'),
-              subtitle: const Text('Controlar dispositivos automaticamente'),
-              value: controller.isAutomatic.value,
-              onChanged: (value) {
-                controller.toggleAutomaticMode();
-              },
-            ),
-          ),
-          
-          ListTile(
-            leading: const Icon(Icons.schedule),
-            title: const Text('Programar Alimentação'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              // Navegar para programação
-            },
-          ),
-        ],
+          childrenPadding: const EdgeInsets.all(16),
+          expandedAlignment: Alignment.topLeft,
+          children: children,
+        ),
       ),
     );
   }

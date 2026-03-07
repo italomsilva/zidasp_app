@@ -1,70 +1,58 @@
 import 'package:signals/signals.dart';
+import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import '../../../core/repositories/pond_repository.dart';
 import '../../../core/dtos/pond_dto.dart';
 import '../../../core/dtos/device_dto.dart';
 
 class PondDetailController {
   final PondRepository _repository;
-  final String pondId;
+  final SessionController _sessionController;
+  PondDetailController(this._repository, this._sessionController);
 
-  // Signal com o DTO completo
-  final pondDTO = signal<PondDTO?>(null);
-
-  // Signals de UI
-  final isLoading = signal<bool>(false);
-  final isSaving = signal<bool>(false);
-  final error = signal<String?>(null);
+  final pond = asyncSignal<PondDTO?>(AsyncState.data(null));
+  final pondId = signal<String>('');
+  final companyName = signal<String>('');
 
   // Computed para dados específicos
-  late final oxygen = computed(() => pondDTO.value?.oxygen ?? 0);
-  late final temperature = computed(() => pondDTO.value?.temperature ?? 0);
-  late final salinity = computed(() => pondDTO.value?.salinity ?? 0);
-  late final ph = computed(() => pondDTO.value?.ph ?? 0);
-  late final transparency = computed(() => pondDTO.value?.transparency ?? 0);
-  late final aeratorsOn = computed(() => pondDTO.value?.aeratorsOn ?? 0);
-  late final aeratorsTotal = computed(() => pondDTO.value?.aeratorsTotal ?? 0);
-  late final pumpsOn = computed(() => pondDTO.value?.pumpsOn ?? 0);
-  late final pumpsTotal = computed(() => pondDTO.value?.pumpsTotal ?? 0);
-  late final hasAlert = computed(() => pondDTO.value?.hasAlert ?? false);
-  late final isAutomatic = computed(() => pondDTO.value?.isAutomatic ?? false);
-  late final isFavorite = computed(() => pondDTO.value?.isFavorite ?? false);
+  late final oxygen = computed(() => pond.value.value?.oxygen ?? 0);
+  late final temperature = computed(() => pond.value.value?.temperature ?? 0);
+  late final salinity = computed(() => pond.value.value?.salinity ?? 0);
+  late final ph = computed(() => pond.value.value?.ph ?? 0);
+  late final transparency = computed(() => pond.value.value?.transparency ?? 0);
+  late final aeratorsOn = computed(() => pond.value.value?.aeratorsOn ?? 0);
+  late final aeratorsTotal = computed(
+    () => pond.value.value?.aeratorsTotal ?? 0,
+  );
+  late final pumpsOn = computed(() => pond.value.value?.pumpsOn ?? 0);
+  late final pumpsTotal = computed(() => pond.value.value?.pumpsTotal ?? 0);
+  late final hasAlert = computed(() => pond.value.value?.hasAlert ?? false);
+  late final isAutomatic = computed(
+    () => pond.value.value?.isAutomatic ?? false,
+  );
+  late final isFavorite = computed(() => pond.value.value?.isFavorite ?? false);
 
-  // Lista de dispositivos
-  late final devices = computed(() => pondDTO.value?.devices ?? []);
+  late final sensors = pond.value.value?.sensors.toList() ?? [];
+  late final actuators = pond.value.value?.actuators.toList() ?? [];
 
-  // Sensores (filtrados por tipo)
-  late final sensors = computed(() {
-    return devices.value.where((d) => d.type == 'Sensor').toList();
-  });
-
-  // Aeradores (filtrados por tipo)
-  late final aeradores = computed(() {
-    return devices.value.where((d) => d.type == 'Aerador').toList();
-  });
-
-  // Bombas (filtradas por tipo)
-  late final bombas = computed(() {
-    return devices.value.where((d) => d.type == 'Bomba').toList();
-  });
-
-  PondDetailController({
-    required this.pondId,
-    required PondRepository repository,
-  }) : _repository = repository {
-    loadPondDetails();
+  Future<void> initialize(String id) async {
+    pond.set(AsyncState.loading());
+    final userSession = await _sessionController.loadUser();
+    pondId.value = id;
+    await loadPondDetails();
+    final companPond = userSession?.companies.firstWhere(
+      (company) => company.id == pond.value.value?.companyId,
+    );
+    companyName.value = companPond?.name ?? companyName.value;
   }
 
   Future<void> loadPondDetails() async {
-    isLoading.value = true;
-    error.value = null;
+    pond.set(AsyncState.loading());
 
     try {
-      final result = await _repository.getPondDetails(pondId);
-      pondDTO.value = result;
+      final result = await _repository.getPondDetails(pondId.value);
+      pond.set(AsyncState.data(result));
     } catch (e) {
-      error.value = e.toString();
-    } finally {
-      isLoading.value = false;
+      pond.set(AsyncState.error(e));
     }
   }
 
@@ -73,18 +61,18 @@ class PondDetailController {
     _updateDeviceLocally(deviceId, isOn);
 
     try {
-      await _repository.toggleDevice(pondId, deviceId, isOn);
+      await _repository.toggleDevice(pondId.value, deviceId, isOn);
     } catch (e) {
       // Reverter em caso de erro
       _updateDeviceLocally(deviceId, !isOn);
-      error.value = e.toString();
+      pond.set(AsyncState.error(e));
     }
   }
 
   void _updateDeviceLocally(String deviceId, bool isOn) {
-    if (pondDTO.value == null) return;
+    if (pond.value.value == null) return;
 
-    final updatedDevices = pondDTO.value!.devices.map((device) {
+    final updatedDevices = pond.value.value!.devices.map((device) {
       if (device.id == deviceId) {
         return DeviceDTO(
           id: device.id,
@@ -107,55 +95,63 @@ class PondDetailController {
         .where((d) => d.type == 'Bomba' && d.isOn)
         .length;
 
-    pondDTO.value = PondDTO(
-      id: pondDTO.value!.id,
-      name: pondDTO.value!.name,
-      companyId: pondDTO.value!.companyId,
-      oxygen: pondDTO.value!.oxygen,
-      temperature: pondDTO.value!.temperature,
-      salinity: pondDTO.value!.salinity,
-      ph: pondDTO.value!.ph,
-      transparency: pondDTO.value!.transparency,
-      aeratorsOn: aeratorsCount,
-      aeratorsTotal: pondDTO.value!.aeratorsTotal,
-      pumpsOn: pumpsCount,
-      pumpsTotal: pondDTO.value!.pumpsTotal,
-      hasAlert: pondDTO.value!.hasAlert,
-      isFavorite: pondDTO.value!.isFavorite,
-      isAutomatic: pondDTO.value!.isAutomatic,
-      lastUpdate: DateTime.now(),
-      devices: updatedDevices,
-      sensors: pondDTO.value!.sensors,
-      actuators: pondDTO.value!.actuators,
+    pond.set(
+      AsyncState.data(
+        PondDTO(
+          id: pond.value.value!.id,
+          name: pond.value.value!.name,
+          companyId: pond.value.value!.companyId,
+          oxygen: pond.value.value!.oxygen,
+          temperature: pond.value.value!.temperature,
+          salinity: pond.value.value!.salinity,
+          ph: pond.value.value!.ph,
+          transparency: pond.value.value!.transparency,
+          aeratorsOn: aeratorsCount,
+          aeratorsTotal: pond.value.value!.aeratorsTotal,
+          pumpsOn: pumpsCount,
+          pumpsTotal: pond.value.value!.pumpsTotal,
+          hasAlert: pond.value.value!.hasAlert,
+          isFavorite: pond.value.value!.isFavorite,
+          isAutomatic: pond.value.value!.isAutomatic,
+          lastUpdate: DateTime.now(),
+          devices: updatedDevices,
+          sensors: pond.value.value!.sensors,
+          actuators: pond.value.value!.actuators,
+        ),
+      ),
     );
   }
 
   Future<void> toggleFavorite() async {
-    if (pondDTO.value == null) return;
+    if (pond.value.value == null) return;
 
-    final newValue = !pondDTO.value!.isFavorite;
+    final newValue = !pond.value.value!.isFavorite;
 
     // Atualização otimista
-    pondDTO.value = PondDTO(
-      id: pondDTO.value!.id,
-      name: pondDTO.value!.name,
-      companyId: pondDTO.value!.companyId,
-      oxygen: pondDTO.value!.oxygen,
-      temperature: pondDTO.value!.temperature,
-      salinity: pondDTO.value!.salinity,
-      ph: pondDTO.value!.ph,
-      transparency: pondDTO.value!.transparency,
-      aeratorsOn: pondDTO.value!.aeratorsOn,
-      aeratorsTotal: pondDTO.value!.aeratorsTotal,
-      pumpsOn: pondDTO.value!.pumpsOn,
-      pumpsTotal: pondDTO.value!.pumpsTotal,
-      hasAlert: pondDTO.value!.hasAlert,
-      isFavorite: newValue,
-      isAutomatic: pondDTO.value!.isAutomatic,
-      lastUpdate: DateTime.now(),
-      devices: pondDTO.value!.devices,
-      sensors: pondDTO.value!.sensors,
-      actuators: pondDTO.value!.actuators,
+    pond.set(
+      AsyncState.data(
+        PondDTO(
+          id: pond.value.value!.id,
+          name: pond.value.value!.name,
+          companyId: pond.value.value!.companyId,
+          oxygen: pond.value.value!.oxygen,
+          temperature: pond.value.value!.temperature,
+          salinity: pond.value.value!.salinity,
+          ph: pond.value.value!.ph,
+          transparency: pond.value.value!.transparency,
+          aeratorsOn: pond.value.value!.aeratorsOn,
+          aeratorsTotal: pond.value.value!.aeratorsTotal,
+          pumpsOn: pond.value.value!.pumpsOn,
+          pumpsTotal: pond.value.value!.pumpsTotal,
+          hasAlert: pond.value.value!.hasAlert,
+          isFavorite: newValue,
+          isAutomatic: pond.value.value!.isAutomatic,
+          lastUpdate: DateTime.now(),
+          devices: pond.value.value!.devices,
+          sensors: pond.value.value!.sensors,
+          actuators: pond.value.value!.actuators,
+        ),
+      ),
     );
 
     // Aqui você chamaria a API para favoritar
@@ -163,32 +159,36 @@ class PondDetailController {
   }
 
   Future<void> toggleAutomaticMode() async {
-    if (pondDTO.value == null) return;
+    if (pond.value.value == null) return;
 
-    final newValue = !pondDTO.value!.isAutomatic;
+    final newValue = !pond.value.value!.isAutomatic;
 
-    pondDTO.value = PondDTO(
-      id: pondDTO.value!.id,
-      name: pondDTO.value!.name,
-      companyId: pondDTO.value!.companyId,
-      oxygen: pondDTO.value!.oxygen,
-      temperature: pondDTO.value!.temperature,
-      salinity: pondDTO.value!.salinity,
-      ph: pondDTO.value!.ph,
-      transparency: pondDTO.value!.transparency,
-      aeratorsOn: pondDTO.value!.aeratorsOn,
-      aeratorsTotal: pondDTO.value!.aeratorsTotal,
-      pumpsOn: pondDTO.value!.pumpsOn,
-      pumpsTotal: pondDTO.value!.pumpsTotal,
-      hasAlert: pondDTO.value!.hasAlert,
-      isFavorite: pondDTO.value!.isFavorite,
-      isAutomatic: newValue,
-      lastUpdate: DateTime.now(),
-      devices: pondDTO.value!.devices,
-      sensors: pondDTO.value!.sensors,
-      actuators: pondDTO.value!.actuators,
+    pond.set(
+      AsyncState.data(
+        PondDTO(
+          id: pond.value.value!.id,
+          name: pond.value.value!.name,
+          companyId: pond.value.value!.companyId,
+          oxygen: pond.value.value!.oxygen,
+          temperature: pond.value.value!.temperature,
+          salinity: pond.value.value!.salinity,
+          ph: pond.value.value!.ph,
+          transparency: pond.value.value!.transparency,
+          aeratorsOn: pond.value.value!.aeratorsOn,
+          aeratorsTotal: pond.value.value!.aeratorsTotal,
+          pumpsOn: pond.value.value!.pumpsOn,
+          pumpsTotal: pond.value.value!.pumpsTotal,
+          hasAlert: pond.value.value!.hasAlert,
+          isFavorite: pond.value.value!.isFavorite,
+          isAutomatic: newValue,
+          lastUpdate: DateTime.now(),
+          devices: pond.value.value!.devices,
+          sensors: pond.value.value!.sensors,
+          actuators: pond.value.value!.actuators,
+        ),
+      ),
     );
 
-    await _repository.updateSettings(pondId, {'isAutomatic': newValue});
+    await _repository.updateSettings(pondId.value, {'isAutomatic': newValue});
   }
 }

@@ -245,8 +245,8 @@ class MockData {
 
   static List<Map<String, dynamic>> sensors = [
     {'id': '1', 'type': 'Oxygen', 'value': 7.2, 'unity': 'mg/L'},
-    {'id': '2', 'type': 'Salinidade', 'value': 25.0, 'unity': 'ppt'},
-    {'id': '3', 'type': 'Temperatura', 'value': 28.5, 'unity': '°C'},
+    {'id': '2', 'type': 'Salinity', 'value': 25.0, 'unity': 'ppt'},
+    {'id': '3', 'type': 'Temperature', 'value': 28.5, 'unity': '°C'},
   ];
 
   static List<Map<String, dynamic>> actuators = [

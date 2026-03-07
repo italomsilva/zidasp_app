@@ -9,9 +9,9 @@ final getIt = GetIt.instance;
 
 class PondModule {
   static void init() {
-      final pondRepository = getIt<PondRepository>();
-      final companyRepository = getIt<CompanyRepository>();
-      final sessionController = getIt<SessionController>();
+    final pondRepository = getIt<PondRepository>();
+    final companyRepository = getIt<CompanyRepository>();
+    final sessionController = getIt<SessionController>();
 
     getIt.registerFactory<PondListController>(
       () => PondListController(
@@ -20,12 +20,9 @@ class PondModule {
         sessionController,
       ),
     );
-    
-    getIt.registerFactoryParam<PondDetailController, String, void>(
-      (pondId, _) => PondDetailController(
-        pondId: pondId,
-        repository: pondRepository,
-      ),
+
+    getIt.registerFactory<PondDetailController>(
+      () => PondDetailController(pondRepository, sessionController),
     );
   }
 }
