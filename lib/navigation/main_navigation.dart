@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:zidasp_app/core/di.dart';
-import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/core/theme/app_theme.dart';
 import 'package:zidasp_app/modules/pond/pages/pond_list_page.dart';
 import 'package:zidasp_app/widgets/shared/theme_switcher.dart';
-import '../core/theme/theme_controller.dart';
 import '../modules/tide/pages/tide_page.dart';
 import '../modules/auth/pages/profile_page.dart';
 
