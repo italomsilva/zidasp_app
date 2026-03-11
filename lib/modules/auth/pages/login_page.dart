@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:signals/signals_flutter.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:zidasp_app/widgets/shared/custom_button.dart';
+import '../../../widgets/shared/custom_text_field.dart';
 import '../../../core/di.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/login_controller.dart';
@@ -16,6 +18,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late final controller = inject<LoginController>();
 
+  final _cpfFormatter = MaskTextInputFormatter(
+    mask: '###.###.###-##',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
   @override
   void dispose() {
     super.dispose();
@@ -29,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
         child: CustomScrollView(
           slivers: [
             SliverFillRemaining(
-              hasScrollBody: false, 
+              hasScrollBody: false,
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
@@ -83,62 +90,35 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             const SizedBox(height: 32),
                             Watch(
-                              (context) => TextField(
+                              (context) => CustomTextField(
                                 onChanged: controller.setDocumentInput,
-                                keyboardType: TextInputType.emailAddress,
+                                keyboardType: TextInputType.number,
                                 textInputAction: TextInputAction.next,
-                                decoration: InputDecoration(
-                                  labelText: 'CPF (Somente números)',
-                                  hintText: '12345678900',
-                                  prefixIcon: const Icon(Icons.email_outlined),
-                                  errorText: controller.documentError.value,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: AppColors.shrimpAlert,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
+                                labelText: 'CPF',
+                                hintText: '000.000.000-00',
+                                prefixIcon: Icons.badge_outlined,
+                                errorText: controller.documentError.value,
+                                inputFormatters: [_cpfFormatter],
                               ),
                             ),
 
                             const SizedBox(height: 16),
 
                             Watch(
-                              (context) => TextField(
+                              (context) => CustomTextField(
                                 onChanged: controller.setPasswordInput,
                                 obscureText:
                                     !controller.isPasswordVisible.value,
                                 textInputAction: TextInputAction.done,
-                                decoration: InputDecoration(
-                                  labelText: 'Senha',
-                                  hintText: '',
-                                  prefixIcon: const Icon(Icons.lock_outline),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      controller.isPasswordVisible.value
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed:
-                                        controller.togglePasswordVisibility,
-                                  ),
-                                  errorText: controller.passwordError.value,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                      color: AppColors.shrimpAlert,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
+                                labelText: 'Senha',
+                                hintText: '********',
+                                prefixIcon: Icons.lock_outline,
+                                suffixIcon: controller.isPasswordVisible.value
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                onSuffixIconPressed:
+                                    controller.togglePasswordVisibility,
+                                errorText: controller.passwordError.value,
                               ),
                             ),
 
@@ -268,12 +248,21 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
   Future<void> _handleLogin() async {
     final success = await controller.login();
 
     if (success && mounted) {
       Navigator.pushReplacementNamed(context, '/home');
+    } else if (mounted &&
+        controller.errorMessage.value != null &&
+        controller.errorMessage.value!.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(controller.errorMessage.value!),
+          backgroundColor: AppColors.shrimpAlert,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 }

@@ -8,12 +8,14 @@ class PondDeviceGroup extends StatelessWidget {
   final String title;
   final List<ActuatorDTO> devices;
   final Color accentColor;
+  final Function(bool) onChanged;
 
   const PondDeviceGroup({
     super.key,
     required this.title,
     required this.devices,
     required this.accentColor,
+    required this.onChanged,
   });
 
   @override
@@ -63,7 +65,7 @@ class PondDeviceGroup extends StatelessWidget {
                   deviceType: device.type,
                   isOn: device.active,
                   onChanged: (value) {
-                    // Implement toggle logic via controller if needed
+                    onChanged(value);
                   },
                 ),
               );

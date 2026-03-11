@@ -180,7 +180,7 @@ class _PondDetailPageState extends State<PondDetailPage> {
                                           deviceType: device.type,
                                           isOn: device.active,
                                           onChanged: (value) {
-                                            // Implement toggle logic via controller if needed
+                                           controller.toggleDevice(device.pondId, value);
                                           },
                                         ),
                                       );

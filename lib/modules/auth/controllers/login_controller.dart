@@ -1,11 +1,13 @@
 import 'package:signals/signals.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
-import 'package:zidasp_app/core/repositories/user_repository.dart';
+import 'package:zidasp_app/core/repositories/i_user_repository.dart';
+import '../../../core/exceptions/auth_exception.dart';
+import '../../../core/utils/cpf_validator.dart';
 
 enum LoginStatus { initial, loading, success, error }
 
 class LoginController {
-  final UserRepository _repository;
+  final IUserRepository _repository;
   final SessionController _sessionController;
 
   // Signals para campos do formulário
@@ -49,7 +51,9 @@ class LoginController {
 
   void _validateDocument() {
     if (documentInput.value.isEmpty) {
-      documentError.value = 'Documento é obrigatório';
+      documentError.value = 'CPF é obrigatório';
+    } else if (!CpfValidator.isValid(documentInput.value)) {
+      documentError.value = 'CPF inválido';
     } else {
       documentError.value = null;
     }
@@ -87,9 +91,13 @@ class LoginController {
 
       status.value = LoginStatus.success;
       return true;
+    } on AuthException catch (e) {
+      status.value = LoginStatus.error;
+      errorMessage.value = e.message;
+      return false;
     } catch (e) {
       status.value = LoginStatus.error;
-      errorMessage.value = 'Erro inesperado. Tente novamente.';
+      errorMessage.value = 'Erro inesperado. Tente novamente mais tarde.';
       return false;
     }
   }

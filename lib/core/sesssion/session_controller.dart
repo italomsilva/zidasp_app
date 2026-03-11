@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:zidasp_app/core/sesssion/models/company_session.dart';
 import 'package:zidasp_app/core/sesssion/models/user_session.dart';
 
 class SessionController {
-  final SharedPreferences _prefs;
-  SessionController(this._prefs);
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  SessionController();
 
   Future<UserSession> saveUser(String id, String name, String token) async {
     final UserSession user = UserSession(
@@ -14,22 +15,21 @@ class SessionController {
       token: token,
       companies: [],
     );
-    await _prefs.setString(
-      'user_session',
-      jsonEncode(user.toPersistenceJson()),
+    await _secureStorage.write(
+      key: 'user_session',
+      value: jsonEncode(user.toPersistenceJson()),
     );
     return user;
   }
 
   Future<UserSession?> loadUser() async {
-    final userString = _prefs.getString('user_session'); // getString não é Future
+    final userString = await _secureStorage.read(key: 'user_session');
     if (userString == null) {
       return null;
     }
-    
+
     final userJson = jsonDecode(userString) as Map<String, dynamic>;
 
-    // CORREÇÃO: Mapeando a lista dinâmica para List<CompanySession>
     final List<dynamic> companiesRaw = userJson['companies'] ?? [];
     final companies = companiesRaw
         .map((item) => CompanySession.fromJson(item as Map<String, dynamic>))
@@ -39,26 +39,28 @@ class SessionController {
       id: userJson['id'],
       name: userJson['name'],
       token: userJson['token'],
-      companies: companies, // Agora o tipo List<CompanySession> está correto
+      companies: companies,
     );
   }
 
   Future<UserSession?> saveCompanies(List<CompanySession> companies) async {
-    final userString = _prefs.getString('user_session');
+    final userString = await _secureStorage.read(key: 'user_session');
     if (userString == null) {
       return null;
     }
-    
+
     final userJson = jsonDecode(userString) as Map<String, dynamic>;
-    
-    // CORREÇÃO: Converter a lista de objetos para lista de Maps antes do Encode
+
     userJson['companies'] = companies.map((c) => c.toJson()).toList();
-    
-    await _prefs.setString('user_session', jsonEncode(userJson));
+
+    await _secureStorage.write(
+      key: 'user_session',
+      value: jsonEncode(userJson),
+    );
     return loadUser();
   }
 
   Future<void> logout() async {
-    await _prefs.remove('user_session');
+    await _secureStorage.delete(key: 'user_session');
   }
 }

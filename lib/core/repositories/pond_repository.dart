@@ -18,7 +18,7 @@ class PondRepository {
 
   // Atualiza status de um dispositivo
   Future<void> toggleDevice(String pondId, String deviceId, bool isOn) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   // Atualiza configurações do viveiro

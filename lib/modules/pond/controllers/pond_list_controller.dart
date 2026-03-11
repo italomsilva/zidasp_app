@@ -51,7 +51,7 @@ class PondListController {
       return;
     }
 
-    selectedCompanyId.value = userCompanies.first?.id;
+    selectedCompanyId.value = userCompanies.first.id;
 
     if (selectedCompanyId.value != null) {
       await loadPonds();

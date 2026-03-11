@@ -7,42 +7,40 @@ import '../controllers/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
-  
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
- late final controller = inject<ProfileController>();
-  
+  late final controller = inject<ProfileController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Watch(
-        (context) {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 16),
-                _buildStatsCard(), // Card com dados extras do DTO
-                const SizedBox(height: 16),
-                _buildCompaniesCard(),
-                const SizedBox(height: 16),
-                _buildSettingsCard(),
-              ],
-            ),
-          );
-        },
-      ),
+      body: Watch((context) {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildProfileHeader(),
+              const SizedBox(height: 16),
+              _buildStatsCard(), // Card com dados extras do DTO
+              const SizedBox(height: 16),
+              _buildCompaniesCard(),
+              const SizedBox(height: 16),
+              _buildSettingsCard(),
+            ],
+          ),
+        );
+      }),
     );
   }
-  
+
   Widget _buildProfileHeader() {
     return CustomCard(
       child: Column(
@@ -50,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // Avatar
           CircleAvatar(
             radius: 50,
-            backgroundColor: AppColors.shrimpAlert.withValues(alpha:0.1),
+            backgroundColor: AppColors.shrimpAlert.withValues(alpha: 0.1),
             child: Watch(
               (context) => Text(
                 controller.userInitials.value,
@@ -62,36 +60,38 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Nome
           Watch(
             (context) => Text(
               controller.userName.value,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
-          
+
           // Email
           Watch(
             (context) => Text(
               controller.userEmail.value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
             ),
           ),
-          
+
           // Role badge (vem do DTO)
           Watch(
             (context) => Container(
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: controller.getRoleColor(controller.userRole.value).withValues(alpha:0.1),
+                color: controller
+                    .getRoleColor(controller.userRole.value)
+                    .withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -108,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-  
+
   Widget _buildStatsCard() {
     return CustomCard(
       child: Row(
@@ -116,12 +116,10 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           // Total viveiros (do DTO)
           Watch(
-            (context) => _buildStatItem(
-              'Viveiros',
-              '${controller.totalPonds.value}',
-            ),
+            (context) =>
+                _buildStatItem('Viveiros', '${controller.totalPonds.value}'),
           ),
-          
+
           // Total empresas (do DTO)
           Watch(
             (context) => _buildStatItem(
@@ -129,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
               '${controller.companiesCount.value}',
             ),
           ),
-          
+
           // Data de cadastro (do DTO)
           Watch(
             (context) => _buildStatItem(
@@ -141,90 +139,84 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-  
+
   Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12)),
       ],
     );
   }
-  
+
   Widget _buildCompaniesCard() {
-    return Watch(
-      (context) {
-        final companies = controller.companiesDTO.value;
-        
-        return CustomCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Empresas Associadas',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              ...companies.map((company) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: ListTile(
-                    leading: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.shrimpAlert.withValues(alpha:0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.business,
-                        color: AppColors.shrimpAlert,
-                        size: 20,
-                      ),
+    return Watch((context) {
+      final companies = controller.companiesDTO.value;
+
+      return CustomCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Empresas Associadas',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 16),
+
+            ...companies.map((company) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.shrimpAlert.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
-                    title: Text(company.name),
-                    subtitle: Text(
-                      '${company.totalPonds} viveiros • ${company.activePonds} ativos',
+                    child: const Icon(
+                      Icons.business,
+                      color: AppColors.shrimpAlert,
+                      size: 20,
                     ),
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: controller.getRoleColor(company.userRole).withValues(alpha:0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        company.userRole.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: controller.getRoleColor(company.userRole),
-                        ),
+                  ),
+                  title: Text(company.name),
+                  subtitle: Text(
+                    '${company.totalPonds} viveiros • ${company.activePonds} ativos',
+                  ),
+                  trailing: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: controller
+                          .getRoleColor(company.userRole)
+                          .withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      company.userRole.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: controller.getRoleColor(company.userRole),
                       ),
                     ),
                   ),
-                );
-              }).toList(),
-            ],
-          ),
-        );
-      },
-    );
+                ),
+              );
+            }).toList(),
+          ],
+        ),
+      );
+    });
   }
-  
+
   Widget _buildSettingsCard() {
     return CustomCard(
       child: Column(
@@ -234,25 +226,25 @@ class _ProfilePageState extends State<ProfilePage> {
             'Configurações',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           ListTile(
             leading: const Icon(Icons.edit),
             title: const Text('Editar Perfil'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: _showEditDialog,
           ),
-          
+
           ListTile(
             leading: const Icon(Icons.lock),
             title: const Text('Alterar Senha'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: _showPasswordDialog,
           ),
-          
+
           const Divider(),
-          
+
           ListTile(
             leading: const Icon(Icons.logout, color: AppColors.shrimpAlert),
             title: const Text(
@@ -265,12 +257,18 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-  
+
   void _showEditDialog() {
-    final nameController = TextEditingController(text: controller.user.value?.name);
-    final emailController = TextEditingController(text: controller.user.value?.email);
-    final documentController = TextEditingController(text: controller.user.value?.document);
-    
+    final nameController = TextEditingController(
+      text: controller.user.value?.name,
+    );
+    final emailController = TextEditingController(
+      text: controller.user.value?.email,
+    );
+    final documentController = TextEditingController(
+      text: controller.user.value?.document,
+    );
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -312,11 +310,11 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-  
+
   void _showPasswordDialog() {
     // Implementar...
   }
-  
+
   void _showLogoutDialog() {
     showDialog(
       context: context,

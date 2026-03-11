@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:zidasp_app/core/repositories/company_repository.dart';
 import 'package:zidasp_app/core/repositories/pond_repository.dart';
 import 'package:zidasp_app/core/repositories/tide_repository.dart';
+import 'package:zidasp_app/core/repositories/i_user_repository.dart';
 import 'package:zidasp_app/core/repositories/user_repository.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/core/theme/theme_controller.dart';
@@ -26,7 +27,7 @@ class CoreModule {
     );
 
     // 2. Repositórios
-    getIt.registerLazySingleton<UserRepository>(() => UserRepository());
+    getIt.registerLazySingleton<IUserRepository>(() => UserRepository());
 
     getIt.registerLazySingleton<CompanyRepository>(() => CompanyRepository());
 
@@ -35,7 +36,7 @@ class CoreModule {
     getIt.registerLazySingleton<TideRepository>(() => TideRepository());
 
     // 3. Controllers
-    getIt.registerSingleton<SessionController>(SessionController(prefs));
+    getIt.registerSingleton<SessionController>(SessionController());
 
     getIt.registerSingleton<ThemeController>(ThemeController());
   }
