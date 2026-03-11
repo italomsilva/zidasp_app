@@ -13,6 +13,10 @@ class PondDetailController {
   final pondId = signal<String>('');
   final companyName = signal<String>('');
 
+  // Controle de permissão e loading
+  final currentUserRole = signal<String>('employee');
+  final togglingDeviceId = signal<String?>(null);
+
   // Computed para dados específicos
   late final oxygen = computed(() => pond.value.value?.oxygen ?? 0);
   late final temperature = computed(() => pond.value.value?.temperature ?? 0);
@@ -43,6 +47,7 @@ class PondDetailController {
       (company) => company.id == pond.value.value?.companyId,
     );
     companyName.value = companPond?.name ?? companyName.value;
+    currentUserRole.value = companPond?.role ?? 'employee';
   }
 
   Future<void> loadPondDetails() async {
@@ -56,16 +61,39 @@ class PondDetailController {
     }
   }
 
+  // Helper de permissão
+  bool get canManageDevices {
+    return currentUserRole.value == 'owner' || currentUserRole.value == 'admin';
+  }
+
   Future<void> toggleDevice(String deviceId, bool isOn) async {
+    if (!canManageDevices) {
+      pond.set(
+        AsyncState.error('Você não tem permissão para alterar dispositivos.'),
+      );
+      // Aqui a UI deve idealmente receber o feedback num Signal separado de erro não-fatal,
+      // mas vamos deixar propagar o AsyncError para fins deste MVP ou Snackbar na View.
+      return;
+    }
+
+    if (togglingDeviceId.value != null) return; // Trava contra múltiplos clicks
+
+    togglingDeviceId.value = deviceId;
+
     // Atualização otimista
     _updateDeviceLocally(deviceId, isOn);
 
     try {
       await _repository.toggleDevice(pondId.value, deviceId, isOn);
+
+      // Busca status fresco para confirmar a transação do "DB" após o delay
+      await loadPondDetails();
     } catch (e) {
       // Reverter em caso de erro
       _updateDeviceLocally(deviceId, !isOn);
       pond.set(AsyncState.error(e));
+    } finally {
+      togglingDeviceId.value = null;
     }
   }
 

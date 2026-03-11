@@ -12,7 +12,16 @@ class UserRepository implements IUserRepository {
       (u) => u['id'] == id,
       orElse: () => throw Exception('User not found'),
     );
-    return UserDTO.fromJson(userJSON);
+
+    // Injeta campos esperados pelo DTO vindos de relatórios (Simulação Server-Side)
+    final enrichedJSON = Map<String, dynamic>.from(userJSON);
+    enrichedJSON['role'] =
+        'owner'; // default temporario só para o dto nao quebrar
+    enrichedJSON['joinDate'] = DateTime.now();
+    enrichedJSON['totalPonds'] = 0;
+    enrichedJSON['companiesCount'] = 0;
+
+    return UserDTO.fromJson(enrichedJSON);
   }
 
   // Retorna lista de DTOs das empresas
@@ -54,7 +63,7 @@ class UserRepository implements IUserRepository {
       final cleanDocument = document.replaceAll(RegExp(r'[^0-9]'), '');
 
       final userJSON = MockData.users.firstWhere(
-        (u) => u['document'] == cleanDocument,
+        (element) => element['document'] == cleanDocument,
         orElse: () => throw Exception('User not found'),
       );
 
@@ -63,9 +72,16 @@ class UserRepository implements IUserRepository {
         throw Exception('Password constraint');
       }
 
-      final result = UserDTO.fromJson(userJSON);
+      final enrichedJSON = Map<String, dynamic>.from(userJSON);
+      enrichedJSON['role'] = 'owner'; // mock fallback
+      enrichedJSON['joinDate'] = DateTime.now();
+      enrichedJSON['totalPonds'] = 0;
+      enrichedJSON['companiesCount'] = 0;
+
+      final result = UserDTO.fromJson(enrichedJSON);
       return result;
     } catch (e) {
+      print(e);
       throw InvalidCredentialsException('CPF ou senha inválidos.');
     }
   }

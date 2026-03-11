@@ -1,25 +1,19 @@
 class CompanySession {
   final String id;
   final String name;
+  final String role; // Novo campo para gerenciar acesso
 
-  CompanySession({
-    required this.id,
-    required this.name,
-  });
+  CompanySession({required this.id, required this.name, required this.role});
 
-  // Alterado para toJson para manter o padrão usado no SessionController
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name, 'role': role};
   }
 
   factory CompanySession.fromJson(Map<String, dynamic> json) {
     return CompanySession(
-      // Uso de null-coalescing para evitar erros de tipo se o JSON vier incompleto
       id: json['id'] ?? '',
       name: json['name'] ?? '',
+      role: json['role'] ?? 'employee', // Fallback seguro
     );
   }
 }

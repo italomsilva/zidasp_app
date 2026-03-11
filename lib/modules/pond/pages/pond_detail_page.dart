@@ -179,8 +179,18 @@ class _PondDetailPageState extends State<PondDetailPage> {
                                           deviceName: device.name,
                                           deviceType: device.type,
                                           isOn: device.active,
+                                          isLoading:
+                                              controller
+                                                  .togglingDeviceId
+                                                  .value ==
+                                              device.id,
+                                          disabled:
+                                              !controller.canManageDevices,
                                           onChanged: (value) {
-                                           controller.toggleDevice(device.pondId, value);
+                                            controller.toggleDevice(
+                                              device.id,
+                                              value,
+                                            ); // fixed device.id which was device.pondId in mockup
                                           },
                                         ),
                                       );

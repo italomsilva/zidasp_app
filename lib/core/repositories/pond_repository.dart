@@ -16,9 +16,31 @@ class PondRepository {
     }
   }
 
-  // Atualiza status de um dispositivo
+  // Atualiza status de um dispositivo com delay simulado
   Future<void> toggleDevice(String pondId, String deviceId, bool isOn) async {
-    await Future.delayed(const Duration(seconds: 2));
+    // 1. Simula latência de rede (3 segundos exigidos)
+    await Future.delayed(const Duration(seconds: 3));
+
+    try {
+      // 2. Localizar viveiro no MockData
+      final pondIndex = MockData.ponds.indexWhere((p) => p['id'] == pondId);
+      if (pondIndex == -1) throw Exception('Viveiro não encontrado');
+
+      // 3. Localizar atuador/dispositivo dentro do viveiro
+      final actuatorsList = MockData.ponds[pondIndex]['actuators'] as List;
+      final deviceIndex = actuatorsList.indexWhere((d) => d['id'] == deviceId);
+
+      if (deviceIndex == -1) throw Exception('Dispositivo não encontrado');
+
+      // 4. Muta o objeto no DB em memória
+      actuatorsList[deviceIndex]['active'] = isOn;
+
+      // Atualiza o timestamp do viveiro
+      MockData.ponds[pondIndex]['lastUpdate'] = DateTime.now()
+          .toIso8601String();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // Atualiza configurações do viveiro
@@ -41,11 +63,7 @@ class PondRepository {
           .where((pond) => pond['companyId'] == companyId)
           .toList();
 
-      final result = pondsJson
-          .map(
-            (pJ) => PondDTO.fromJson(pJ)
-          )
-          .toList();
+      final result = pondsJson.map((pJ) => PondDTO.fromJson(pJ)).toList();
       return result;
     } catch (e) {
       rethrow;

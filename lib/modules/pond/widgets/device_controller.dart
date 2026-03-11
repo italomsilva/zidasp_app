@@ -8,6 +8,8 @@ class DeviceController extends StatefulWidget {
   final bool isOn;
   final String? power;
   final String? status;
+  final bool disabled;
+  final bool isLoading;
   final Function(bool)? onChanged;
 
   const DeviceController({
@@ -17,6 +19,8 @@ class DeviceController extends StatefulWidget {
     required this.isOn,
     this.power,
     this.status,
+    this.disabled = false,
+    this.isLoading = false,
     this.onChanged,
   }) : super(key: key);
 
@@ -68,8 +72,9 @@ class _DeviceControllerState extends State<DeviceController> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final color = _getDeviceColor();
+    final color = widget.disabled ? Colors.grey : _getDeviceColor();
     final icon = _getDeviceIcon();
+    final opacity = widget.disabled ? 0.3 : 1.0;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 10),
@@ -121,30 +126,42 @@ class _DeviceControllerState extends State<DeviceController> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
-                          color: isDark ? Colors.white : AppColors.lightText,
+                          color: (isDark ? Colors.white : AppColors.lightText)
+                              .withValues(alpha: opacity),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         widget.deviceType,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 10,
-                          color: AppColors.neutralGray,
+                          color: AppColors.neutralGray.withValues(
+                            alpha: opacity,
+                          ),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Switch(
-                  value: _isOn,
-                  onChanged: (value) {
-                    setState(() => _isOn = value);
-                    widget.onChanged?.call(value);
-                  },
-                  activeThumbColor: color,
-                ),
+                if (widget.isLoading)
+                  const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                else
+                  Switch(
+                    value: _isOn,
+                    onChanged: widget.disabled
+                        ? null
+                        : (value) {
+                            setState(() => _isOn = value);
+                            widget.onChanged?.call(value);
+                          },
+                    activeThumbColor: color,
+                  ),
               ],
             ),
           ),

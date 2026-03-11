@@ -1,7 +1,5 @@
-
-import 'dart:math';
-
 class MockData {
+  // Tornando as listas mutáveis (removendo consts implícitos onde necessário) para agir como DB em memória
   static List<Map<String, dynamic>> ponds = [
     {
       'id': '1',
@@ -19,8 +17,10 @@ class MockData {
       'hasAlert': false,
       'isFavorite': true,
       'isAutomatic': true,
-      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
-      'devices': [],
+      'lastUpdate': DateTime.now().toIso8601String(),
+      'devices': [
+        // Copiamos os IDs de devices do Viveiro 1 para popular os Actuators DTO depois
+      ],
       'sensors': sensors,
       'actuators': actuators,
     },
@@ -40,7 +40,7 @@ class MockData {
       'hasAlert': true,
       'isFavorite': false,
       'isAutomatic': true,
-      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'lastUpdate': DateTime.now().toIso8601String(),
       'devices': [],
       'sensors': sensors,
       'actuators': actuators,
@@ -61,14 +61,14 @@ class MockData {
       'hasAlert': false,
       'isFavorite': true,
       'isAutomatic': false,
-      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'lastUpdate': DateTime.now().toIso8601String(),
       'devices': [],
       'sensors': sensors,
       'actuators': actuators,
     },
     {
       'id': '6',
-      'name': 'Viveiro do  Pelado',
+      'name': 'Viveiro do Pelado',
       'companyId': '1',
       'oxygen': 7.1,
       'temperature': 27.8,
@@ -82,7 +82,7 @@ class MockData {
       'hasAlert': false,
       'isFavorite': true,
       'isAutomatic': false,
-      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'lastUpdate': DateTime.now().toIso8601String(),
       'devices': [],
       'sensors': sensors,
       'actuators': actuators,
@@ -103,7 +103,7 @@ class MockData {
       'hasAlert': false,
       'isFavorite': true,
       'isAutomatic': false,
-      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'lastUpdate': DateTime.now().toIso8601String(),
       'devices': [],
       'sensors': sensors,
       'actuators': actuators,
@@ -124,7 +124,7 @@ class MockData {
       'hasAlert': false,
       'isFavorite': false,
       'isAutomatic': true,
-      'lastUpdate': DateTime.now().toIso8601String(), // ← String ISO
+      'lastUpdate': DateTime.now().toIso8601String(),
       'devices': [],
       'sensors': sensors,
       'actuators': actuators,
@@ -137,7 +137,9 @@ class MockData {
       'name': 'Aerador Principal',
       'type': 'Aerador',
       'status': true,
-      'lastActive': DateTime.now().subtract(const Duration(minutes: 5)),
+      'lastActive': DateTime.now()
+          .subtract(const Duration(minutes: 5))
+          .toIso8601String(),
       'pondId': '1',
       'power': '2.5 kW',
     },
@@ -146,7 +148,9 @@ class MockData {
       'name': 'Aerador Secundário',
       'type': 'Aerador',
       'status': false,
-      'lastActive': DateTime.now().subtract(const Duration(hours: 2)),
+      'lastActive': DateTime.now()
+          .subtract(const Duration(hours: 2))
+          .toIso8601String(),
       'pondId': '1',
       'power': '2.0 kW',
     },
@@ -155,7 +159,7 @@ class MockData {
       'name': 'Motor de Bomba',
       'type': 'Bomba',
       'status': true,
-      'lastActive': DateTime.now(),
+      'lastActive': DateTime.now().toIso8601String(),
       'pondId': '1',
       'power': '5.0 kW',
     },
@@ -164,7 +168,7 @@ class MockData {
       'name': 'Sensor O₂ - Zona A',
       'type': 'Sensor',
       'status': true,
-      'lastActive': DateTime.now(),
+      'lastActive': DateTime.now().toIso8601String(),
       'pondId': '1',
       'battery': '85%',
     },
@@ -173,7 +177,9 @@ class MockData {
       'name': 'Sensor Salinidade',
       'type': 'Sensor',
       'status': true,
-      'lastActive': DateTime.now().subtract(const Duration(minutes: 30)),
+      'lastActive': DateTime.now()
+          .subtract(const Duration(minutes: 30))
+          .toIso8601String(),
       'pondId': '1',
       'battery': '72%',
     },
@@ -185,10 +191,6 @@ class MockData {
       'name': 'Carlos Silva',
       'email': 'carlos@fazenda.com',
       'document': '12345678900',
-      'role': 'Owner',
-      'joinDate': DateTime(2023, 1, 15),
-      'totalPonds': 7,
-      'companiesCount': 2,
       'token': 'token_carlos',
     },
     {
@@ -196,10 +198,6 @@ class MockData {
       'name': 'Maria Santos',
       'email': 'maria@fazenda.com',
       'document': '12345678901',
-      'role': 'Admin',
-      'joinDate': DateTime(2023, 1, 15),
-      'totalPonds': 4,
-      'companiesCount': 2,
       'token': 'token_maria',
     },
     {
@@ -207,10 +205,6 @@ class MockData {
       'name': 'João Pereira',
       'email': 'joao@fazenda.com',
       'document': '12345678902',
-      'role': 'Employee',
-      'joinDate': DateTime(2023, 1, 15),
-      'totalPonds': 5,
-      'companiesCount': 1,
       'token': 'token_joao',
     },
     {
@@ -218,10 +212,6 @@ class MockData {
       'name': 'Ana Costa',
       'email': 'ana@fazenda.com',
       'document': '12345678903',
-      'role': 'Employee',
-      'joinDate': DateTime(2023, 1, 15),
-      'totalPonds': 1,
-      'companiesCount': 1,
       'token': 'token_ana',
     },
     {
@@ -229,10 +219,6 @@ class MockData {
       'name': 'Roberto Alves',
       'email': 'roberto@fazenda.com',
       'document': '62796375307',
-      'role': 'Employee',
-      'joinDate': DateTime(2023, 1, 15),
-      'totalPonds': 4,
-      'companiesCount': 2,
       'token': 'token_roberto',
     },
   ];
@@ -243,14 +229,82 @@ class MockData {
     {'id': '3', 'name': 'Acqua Cultura Brasil', 'document': 'cnpj03'},
   ];
 
+  // Tabela Relacional: User <-> Company
+  static List<Map<String, dynamic>> userCompanies = [
+    {
+      'userId': '1',
+      'companyId': '1',
+      'role': 'owner',
+      'joinDate': DateTime(2023, 1, 15).toIso8601String(),
+    },
+    {
+      'userId': '1',
+      'companyId': '2',
+      'role': 'admin',
+      'joinDate': DateTime(2023, 5, 20).toIso8601String(),
+    },
+
+    {
+      'userId': '2',
+      'companyId': '1',
+      'role': 'admin',
+      'joinDate': DateTime(2023, 2, 10).toIso8601String(),
+    },
+    {
+      'userId': '2',
+      'companyId': '2',
+      'role': 'admin',
+      'joinDate': DateTime(2023, 5, 20).toIso8601String(),
+    },
+
+    {
+      'userId': '3',
+      'companyId': '1',
+      'role': 'employee',
+      'joinDate': DateTime(2023, 3, 5).toIso8601String(),
+    },
+
+    {
+      'userId': '4',
+      'companyId': '1',
+      'role': 'employee',
+      'joinDate': DateTime(2023, 6, 12).toIso8601String(),
+    },
+
+    {
+      'userId': '5',
+      'companyId': '1',
+      'role': 'admin',
+      'joinDate': DateTime(2023, 8, 22).toIso8601String(),
+    },
+    {
+      'userId': '5',
+      'companyId': '2',
+      'role': 'employee',
+      'joinDate': DateTime(2023, 8, 22).toIso8601String(),
+    },
+  ];
+
   static List<Map<String, dynamic>> sensors = [
     {'id': '1', 'type': 'Oxygen', 'value': 7.2, 'unity': 'mg/L'},
     {'id': '2', 'type': 'Salinity', 'value': 25.0, 'unity': 'ppt'},
     {'id': '3', 'type': 'Temperature', 'value': 28.5, 'unity': '°C'},
   ];
 
+  // Actuators atrelados à lista principal de ponds (simplificado para UI direta,
+  // idealmente viriam mesclados da tabela devices no PondRepository)
   static List<Map<String, dynamic>> actuators = [
-    {'type': 'Bomba','name': 'Bomba Principal', 'active': Random.secure().nextBool()},
-    {'type': 'Aerador','name': 'Aerador Principal', 'active': Random.secure().nextBool()},
+    {'id': 'a1', 'type': 'Bomba', 'name': 'Bomba Principal', 'active': true},
+    {
+      'id': 'a2',
+      'type': 'Aerador',
+      'name': 'Aerador Principal',
+      'active': false,
+    },
   ];
+
+  // Utils para recalcular totais dinamicamente
+  static int getTotalPondsByCompany(String companyId) {
+    return ponds.where((p) => p['companyId'] == companyId).length;
+  }
 }

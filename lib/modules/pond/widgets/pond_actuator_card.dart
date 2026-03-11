@@ -3,19 +3,22 @@ import 'package:zidasp_app/core/dtos/actuator_dto.dart';
 import 'package:zidasp_app/core/theme/app_theme.dart';
 import 'package:zidasp_app/modules/pond/widgets/device_controller.dart';
 
-
 class PondDeviceGroup extends StatelessWidget {
   final String title;
   final List<ActuatorDTO> devices;
   final Color accentColor;
-  final Function(bool) onChanged;
+  final bool disabled;
+  final bool isLoading;
+  final Function(bool)? onChanged;
 
   const PondDeviceGroup({
     super.key,
     required this.title,
     required this.devices,
     required this.accentColor,
-    required this.onChanged,
+    this.disabled = false,
+    this.isLoading = false,
+    this.onChanged,
   });
 
   @override
@@ -64,9 +67,13 @@ class PondDeviceGroup extends StatelessWidget {
                   deviceName: device.name,
                   deviceType: device.type,
                   isOn: device.active,
-                  onChanged: (value) {
-                    onChanged(value);
-                  },
+                  disabled: disabled,
+                  isLoading: isLoading,
+                  onChanged: onChanged == null
+                      ? null
+                      : (value) {
+                          onChanged!(value);
+                        },
                 ),
               );
             },
