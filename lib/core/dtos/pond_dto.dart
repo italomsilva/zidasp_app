@@ -2,6 +2,7 @@ import 'package:zidasp_app/core/dtos/actuator_dto.dart';
 import 'package:zidasp_app/core/dtos/sensor_dto.dart';
 import 'package:zidasp_app/core/models/pond.dart';
 import 'package:zidasp_app/data/mock_data.dart';
+import 'package:zidasp_app/core/enums/device_type.dart';
 
 import 'device_dto.dart';
 
@@ -55,58 +56,61 @@ class PondDTO {
     return Pond(id: id, name: name, companyId: companyId);
   }
 
-factory PondDTO.fromJson(Map<String, dynamic> json) {
-  return PondDTO(
-    id: json['id'] ?? '',
-    name: json['name'] ?? '',
-    companyId: json['companyId'] ?? '',
-    
-    // Conversão segura para double
-    oxygen: json['oxygen'] is String 
-        ? double.parse(json['oxygen']) 
-        : (json['oxygen'] ?? 0.0).toDouble(),
-    temperature: json['temperature'] is String 
-        ? double.parse(json['temperature']) 
-        : (json['temperature'] ?? 0.0).toDouble(),
-    salinity: json['salinity'] is String 
-        ? double.parse(json['salinity']) 
-        : (json['salinity'] ?? 0.0).toDouble(),
-    ph: json['ph'] is String 
-        ? double.parse(json['ph']) 
-        : (json['ph'] ?? 0.0).toDouble(),
-    transparency: json['transparency'] is String 
-        ? double.parse(json['transparency']) 
-        : (json['transparency'] ?? 0.0).toDouble(),
-    
-    aeratorsOn: json['aeratorsOn'] ?? 0,
-    aeratorsTotal: json['aeratorsTotal'] ?? 0,
-    pumpsOn: json['pumpsOn'] ?? 0,
-    pumpsTotal: json['pumpsTotal'] ?? 0,
-    
-    hasAlert: json['hasAlert'] ?? false,
-    isFavorite: json['isFavorite'] ?? false,
-    isAutomatic: json['isAutomatic'] ?? false,
-    
-    // Tratamento especial para DateTime
-    lastUpdate: json['lastUpdate'] is DateTime 
-        ? json['lastUpdate']  // ← Se já for DateTime, usa direto
-        : (json['lastUpdate'] != null 
-            ? DateTime.parse(json['lastUpdate'].toString()) 
-            : DateTime.now()),
-        
-    devices: _mockDevices(json['id']),
-    sensors: MockData.sensors.map((e) => SensorDTO.fromJson(e)).toList(),
-    actuators: MockData.actuators.map((e) => ActuatorDTO.fromJson(e)).toList(),
-  );
-}
-
+  factory PondDTO.fromJson(Map<String, dynamic> json) {
+    return PondDTO(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      companyId: json['companyId'] ?? '',
+      
+      // Conversão segura para double
+      oxygen: json['oxygen'] is String 
+          ? double.parse(json['oxygen']) 
+          : (json['oxygen'] ?? 0.0).toDouble(),
+      temperature: json['temperature'] is String 
+          ? double.parse(json['temperature']) 
+          : (json['temperature'] ?? 0.0).toDouble(),
+      salinity: json['salinity'] is String 
+          ? double.parse(json['salinity']) 
+          : (json['salinity'] ?? 0.0).toDouble(),
+      ph: json['ph'] is String 
+          ? double.parse(json['ph']) 
+          : (json['ph'] ?? 0.0).toDouble(),
+      transparency: json['transparency'] is String 
+          ? double.parse(json['transparency']) 
+          : (json['transparency'] ?? 0.0).toDouble(),
+      
+      aeratorsOn: json['aeratorsOn'] ?? 0,
+      aeratorsTotal: json['aeratorsTotal'] ?? 0,
+      pumpsOn: json['pumpsOn'] ?? 0,
+      pumpsTotal: json['pumpsTotal'] ?? 0,
+      
+      hasAlert: json['hasAlert'] ?? false,
+      isFavorite: json['isFavorite'] ?? false,
+      isAutomatic: json['isAutomatic'] ?? false,
+      
+      // Tratamento especial para DateTime
+      lastUpdate: json['lastUpdate'] is DateTime 
+          ? json['lastUpdate']  // ← Se já for DateTime, usa direto
+          : (json['lastUpdate'] != null 
+              ? DateTime.parse(json['lastUpdate'].toString()) 
+              : DateTime.now()),
+          
+      devices: json['devices'] != null 
+          ? (json['devices'] as List).map((e) => DeviceDTO.fromJson(e)).toList()
+          : _mockDevices(json['id']),
+      sensors: (json['sensors'] as List?)?.map((e) => SensorDTO.fromJson(e)).toList() 
+          ?? MockData.sensors.map((e) => SensorDTO.fromJson(e)).toList(),
+      actuators: (json['actuators'] as List?)?.map((e) => ActuatorDTO.fromJson(e)).toList() 
+          ?? MockData.actuators.map((e) => ActuatorDTO.fromJson(e)).toList(),
+    );
+  }
 
   static List<DeviceDTO> _mockDevices(String pondId) {
     return [
       DeviceDTO(
         id: '${pondId}_a1',
         name: 'Aerador Principal',
-        type: 'Aerador',
+        type: DeviceType.aerator,
         isOn: true,
         power: '2.5 kW',
         lastActive: DateTime.now(),
@@ -114,7 +118,7 @@ factory PondDTO.fromJson(Map<String, dynamic> json) {
       DeviceDTO(
         id: '${pondId}_a2',
         name: 'Aerador Secundário',
-        type: 'Aerador',
+        type: DeviceType.aerator,
         isOn: false,
         power: '2.0 kW',
         lastActive: DateTime.now().subtract(const Duration(hours: 2)),
@@ -122,7 +126,7 @@ factory PondDTO.fromJson(Map<String, dynamic> json) {
       DeviceDTO(
         id: '${pondId}_b1',
         name: 'Bomba de Água',
-        type: 'Bomba',
+        type: DeviceType.pump,
         isOn: true,
         power: '5.0 kW',
         lastActive: DateTime.now(),
@@ -130,7 +134,7 @@ factory PondDTO.fromJson(Map<String, dynamic> json) {
       DeviceDTO(
         id: '${pondId}_s1',
         name: 'Sensor O₂',
-        type: 'Sensor',
+        type: DeviceType.sensor,
         isOn: true,
         batteryLevel: 85,
         lastActive: DateTime.now(),
@@ -138,7 +142,7 @@ factory PondDTO.fromJson(Map<String, dynamic> json) {
       DeviceDTO(
         id: '${pondId}_s2',
         name: 'Sensor Temperatura',
-        type: 'Sensor',
+        type: DeviceType.sensor,
         isOn: true,
         batteryLevel: 92,
         lastActive: DateTime.now(),

@@ -1,10 +1,10 @@
-// lib/widgets/shared/device_controller.dart
 import 'package:flutter/material.dart';
+import 'package:zidasp_app/core/enums/device_type.dart';
 import '../../../core/theme/app_theme.dart';
 
 class DeviceController extends StatefulWidget {
   final String deviceName;
-  final String deviceType;
+  final DeviceType deviceType;
   final bool isOn;
   final String? power;
   final String? status;
@@ -38,34 +38,32 @@ class _DeviceControllerState extends State<DeviceController> {
   }
 
   IconData _getDeviceIcon() {
-    switch (widget.deviceType.toLowerCase()) {
-      case 'aerador':
+    switch (widget.deviceType) {
+      case DeviceType.aerator:
         return Icons.air;
-      case 'bomba':
+      case DeviceType.pump:
         return Icons.invert_colors;
-      case 'alimentador':
+      case DeviceType.automatic:
+      case DeviceType.feeder:
         return Icons.fastfood;
-      case 'sensor':
+      case DeviceType.sensor:
         return Icons.sensors;
-      default:
-        return Icons.device_hub;
     }
   }
 
   Color _getDeviceColor() {
     if (!_isOn) return Colors.grey;
 
-    switch (widget.deviceType.toLowerCase()) {
-      case 'aerador':
+    switch (widget.deviceType) {
+      case DeviceType.aerator:
         return AppColors.shrimpAlert;
-      case 'bomba':
+      case DeviceType.pump:
         return AppColors.neutralBlue;
-      case 'alimentador':
+      case DeviceType.automatic:
+      case DeviceType.feeder:
         return AppColors.healthGreen;
-      case 'sensor':
+      case DeviceType.sensor:
         return AppColors.neutralYellow;
-      default:
-        return AppColors.shrimpAlert;
     }
   }
 
@@ -133,7 +131,7 @@ class _DeviceControllerState extends State<DeviceController> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        widget.deviceType,
+                        widget.deviceType.value,
                         style: TextStyle(
                           fontSize: 10,
                           color: AppColors.neutralGray.withValues(

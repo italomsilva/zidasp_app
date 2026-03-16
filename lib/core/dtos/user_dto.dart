@@ -1,4 +1,5 @@
 import 'package:zidasp_app/core/models/user.dart';
+import 'package:zidasp_app/core/enums/user_role_enum.dart';
 
 class UserDTO {
   final String id;
@@ -7,7 +8,7 @@ class UserDTO {
   final String document;
   final int totalCompanies;
   final int totalPonds;
-  final String role;
+  final UserRoleEnum role;
   final DateTime joinDate;
   final String token;
 
@@ -40,7 +41,7 @@ class UserDTO {
           : DateTime.tryParse(json['joinDate']?.toString() ?? '') ?? DateTime.now(),
       totalCompanies: (json['totalCompanies'] ?? json['companiesCount'] ?? 0) as int,
       totalPonds: (json['totalPonds'] ?? 0) as int,
-      role: json['role']?.toString() ?? 'user',
+      role: UserRoleEnum.fromString(json['role'] ?? ''),
       token: json['token']?.toString() ?? '',
     );
   }

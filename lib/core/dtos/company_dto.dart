@@ -1,4 +1,5 @@
 import 'package:zidasp_app/core/models/company.dart';
+import 'package:zidasp_app/core/enums/user_role_enum.dart';
 
 
 class CompanyDTO {
@@ -7,7 +8,7 @@ class CompanyDTO {
   final String document;
   final int totalPonds;
   final int activePonds;
-  final String userRole;
+  final UserRoleEnum userRole;
   
   CompanyDTO({
     required this.id,
@@ -34,7 +35,7 @@ class CompanyDTO {
       document: json['document'],
       totalPonds: json['totalPonds'],
       activePonds: json['activePonds'],
-      userRole: json['userRole'],
+      userRole: UserRoleEnum.fromString(json['userRole'] ?? ''),
     );
   }
   
@@ -46,7 +47,7 @@ class CompanyDTO {
         document: '12.345.678/0001-90',
         totalPonds: 8,
         activePonds: 6,
-        userRole: 'owner',
+        userRole: UserRoleEnum.admin, // mock fallback
       ),
       CompanyDTO(
         id: '2',
@@ -54,7 +55,7 @@ class CompanyDTO {
         document: '98.765.432/0001-10',
         totalPonds: 5,
         activePonds: 4,
-        userRole: 'admin',
+        userRole: UserRoleEnum.admin,
       ),
     ];
   }

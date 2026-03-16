@@ -95,7 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                controller.userRole.value.toUpperCase(),
+                controller.userRole.value?.value.toUpperCase() ?? '',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -200,7 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      company.userRole.toUpperCase(),
+                      company.userRole.value.toUpperCase(),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,

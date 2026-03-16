@@ -51,7 +51,7 @@ class PondCard extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(sensor.type, style: const TextStyle(fontSize: 10)),
+                        Text(sensor.type.value, style: const TextStyle(fontSize: 10)),
                         Text(
                           '${sensor.value.toStringAsFixed(1)}${sensor.unity}',
                           style: TextStyle(

@@ -112,7 +112,7 @@ class _PondDetailPageState extends State<PondDetailPage> {
                               clipBehavior: Clip.none,
                               physics: const BouncingScrollPhysics(),
                               child: Row(
-                                children: controller.sensors.map((sensor) {
+                                children: controller.sensors.value.map((sensor) {
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 24),
                                     child: SensorRingChart(
@@ -153,7 +153,7 @@ class _PondDetailPageState extends State<PondDetailPage> {
                                         ),
                                       ),
                                       Text(
-                                        '${controller.actuators.where((d) => d.active).length}/${controller.actuators.length} ON',
+                                        '${controller.actuators.value.where((d) => d.active).length}/${controller.actuators.value.length} ON',
                                         style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
@@ -167,12 +167,12 @@ class _PondDetailPageState extends State<PondDetailPage> {
                                     shrinkWrap: true,
                                     physics:
                                         const NeverScrollableScrollPhysics(),
-                                    itemCount: controller.actuators.length,
+                                    itemCount: controller.actuators.value.length,
                                     separatorBuilder: (context, index) =>
                                         const SizedBox(height: 8),
                                     itemBuilder: (context, index) {
                                       final device =
-                                          controller.actuators[index];
+                                          controller.actuators.value[index];
                                       return SizedBox(
                                         height: 56,
                                         child: DeviceController(

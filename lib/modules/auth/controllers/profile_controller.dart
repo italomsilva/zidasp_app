@@ -4,6 +4,7 @@ import '../../../core/repositories/i_user_repository.dart';
 import '../../../core/sesssion/session_controller.dart';
 import '../../../core/dtos/user_dto.dart';
 import '../../../core/dtos/company_dto.dart';
+import '../../../core/enums/user_role_enum.dart';
 
 class ProfileController {
   final IUserRepository _repository;
@@ -19,7 +20,7 @@ class ProfileController {
   // Outros computed para dados extras do DTO
   late final totalCompanies = computed(() => userDTO.value?.totalCompanies ?? 0);
   late final totalPonds = computed(() => userDTO.value?.totalPonds ?? 0);
-  late final userRole = computed(() => userDTO.value?.role ?? '');
+  late final userRole = computed(() => userDTO.value?.role);
   late final joinDate = computed(() => userDTO.value?.joinDate);
   late final token = computed(() => userDTO.value?.token ?? '');
 
@@ -95,16 +96,13 @@ class ProfileController {
   }
 
   // Helper para cor da role
-  Color getRoleColor(String role) {
-    switch (role.toLowerCase()) {
-      case 'owner':
-        return const Color(0xFFFF6B6B);
-      case 'admin':
+  Color getRoleColor(UserRoleEnum? role) {
+    if (role == null) return const Color(0xFFF1C40F);
+    switch (role) {
+      case UserRoleEnum.admin:
         return const Color(0xFF3498DB);
-      case 'employee':
+      case UserRoleEnum.employee:
         return const Color(0xFF27AE60);
-      default:
-        return const Color(0xFFF1C40F);
     }
   }
 }

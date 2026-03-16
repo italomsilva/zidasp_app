@@ -1,3 +1,4 @@
+import 'package:zidasp_app/core/enums/user_role_enum.dart';
 import 'package:zidasp_app/data/mock_data.dart';
 import '../dtos/user_dto.dart';
 import '../dtos/company_dto.dart';
@@ -15,8 +16,7 @@ class UserRepository implements IUserRepository {
 
     // Injeta campos esperados pelo DTO vindos de relatórios (Simulação Server-Side)
     final enrichedJSON = Map<String, dynamic>.from(userJSON);
-    enrichedJSON['role'] =
-        'owner'; // default temporario só para o dto nao quebrar
+    enrichedJSON['role'] = UserRoleEnum.admin.value; // default temporario só para o dto nao quebrar
     enrichedJSON['joinDate'] = DateTime.now();
     enrichedJSON['totalPonds'] = 0;
     enrichedJSON['companiesCount'] = 0;
@@ -44,7 +44,7 @@ class UserRepository implements IUserRepository {
       name: name,
       email: email,
       document: document,
-      role: 'owner',
+      role: UserRoleEnum.admin,
       totalPonds: 15,
       totalCompanies: 2,
       joinDate: DateTime(2023, 1, 15),
@@ -73,7 +73,7 @@ class UserRepository implements IUserRepository {
       }
 
       final enrichedJSON = Map<String, dynamic>.from(userJSON);
-      enrichedJSON['role'] = 'owner'; // mock fallback
+      enrichedJSON['role'] = UserRoleEnum.admin.value; // mock fallback
       enrichedJSON['joinDate'] = DateTime.now();
       enrichedJSON['totalPonds'] = 0;
       enrichedJSON['companiesCount'] = 0;

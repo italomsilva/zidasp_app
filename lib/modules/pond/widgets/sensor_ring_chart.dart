@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zidasp_app/core/dtos/sensor_dto.dart';
+import 'package:zidasp_app/core/enums/sensor_type.dart';
 import 'package:zidasp_app/core/theme/app_theme.dart';
 
 class SensorRingChart extends StatelessWidget {
@@ -68,7 +69,7 @@ class SensorRingChart extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          sensor.type,
+          sensor.type.value,
           style: const TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
@@ -80,48 +81,47 @@ class SensorRingChart extends StatelessWidget {
     );
   }
 
-  double _calculatePercentage(String type, double value) {
-    // Definindo limites máximos razoáveis para a visualização do anel
+  double _calculatePercentage(SensorType type, double value) {
     switch (type) {
-      case 'Oxygen':
+      case SensorType.oxygen:
         return (value / 15.0).clamp(0.0, 1.0);
-      case 'Temperature':
+      case SensorType.temperature:
         return (value / 45.0).clamp(0.0, 1.0);
-      case 'Salinity':
+      case SensorType.salinity:
         return (value / 40.0).clamp(0.0, 1.0);
-      case 'ph':
+      case SensorType.ph:
         return (value / 14.0).clamp(0.0, 1.0);
-      default:
-        return (value / 100.0).clamp(0.0, 1.0);
+      case SensorType.transparency:
+        return (value / 2.0).clamp(0.0, 1.0);
     }
   }
 
-  IconData _getSensorIcon(String type) {
+  IconData _getSensorIcon(SensorType type) {
     switch (type) {
-      case 'Oxygen':
+      case SensorType.oxygen:
         return Icons.water_drop_rounded;
-      case 'Temperature':
+      case SensorType.temperature:
         return Icons.thermostat_rounded;
-      case 'Salinity':
+      case SensorType.salinity:
         return Icons.waves_rounded;
-      case 'ph':
+      case SensorType.ph:
         return Icons.science_rounded;
-      default:
-        return Icons.sensors_rounded;
+      case SensorType.transparency:
+        return Icons.visibility_rounded;
     }
   }
 
-  Color _getSensorColor(String type) {
+  Color _getSensorColor(SensorType type) {
     switch (type) {
-      case 'Oxygen':
+      case SensorType.oxygen:
         return AppColors.neutralBlue;
-      case 'Temperature':
+      case SensorType.temperature:
         return AppColors.shrimpAlert;
-      case 'Salinity':
+      case SensorType.salinity:
         return AppColors.healthGreen;
-      case 'ph':
+      case SensorType.ph:
         return AppColors.neutralYellow;
-      default:
+      case SensorType.transparency:
         return AppColors.neutralGray;
     }
   }
