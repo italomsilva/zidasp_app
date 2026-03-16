@@ -1,5 +1,5 @@
-import '../../modules/auth/dtos/company_dto.dart';
-import '../../modules/auth/dtos/user_dto.dart';
+import '../dtos/company_dto.dart';
+import '../dtos/user_dto.dart';
 
 abstract class IUserRepository {
   Future<UserDTO> getUserById(String id);

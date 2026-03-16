@@ -1,12 +1,12 @@
 class Company {
   final String id;
   final String name;
-  final String cnpj;
+  final String document;
 
   Company({
     required this.id, 
     required this.name, 
-    required this.cnpj,
+    required this.document,
   });
 
   factory Company.fromJson(Map<String, dynamic> json) {
@@ -14,7 +14,7 @@ class Company {
       // Garantimos que, se o valor for nulo, ele assuma uma String vazia
       id: json['id']?.toString() ?? '', 
       name: json['name']?.toString() ?? '',
-      cnpj: json['cnpj']?.toString() ?? '',
+      document: json['document']?.toString() ?? '',
     );
   }
 }

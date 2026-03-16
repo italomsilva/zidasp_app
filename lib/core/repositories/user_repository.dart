@@ -1,6 +1,6 @@
 import 'package:zidasp_app/data/mock_data.dart';
-import '../../modules/auth/dtos/user_dto.dart';
-import '../../modules/auth/dtos/company_dto.dart';
+import '../dtos/user_dto.dart';
+import '../dtos/company_dto.dart';
 import '../exceptions/auth_exception.dart';
 import 'i_user_repository.dart';
 
@@ -46,7 +46,7 @@ class UserRepository implements IUserRepository {
       document: document,
       role: 'owner',
       totalPonds: 15,
-      companiesCount: 2,
+      totalCompanies: 2,
       joinDate: DateTime(2023, 1, 15),
       token: 'mock_token_123',
     );

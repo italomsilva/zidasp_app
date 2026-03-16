@@ -4,15 +4,15 @@ import 'package:zidasp_app/core/models/company.dart';
 class CompanyDTO {
   final String id;
   final String name;
-  final String cnpj;
+  final String document;
   final int totalPonds;
   final int activePonds;
-  final String userRole; // 'owner', 'admin', 'employee'
+  final String userRole;
   
   CompanyDTO({
     required this.id,
     required this.name,
-    required this.cnpj,
+    required this.document,
     required this.totalPonds,
     required this.activePonds,
     required this.userRole,
@@ -23,7 +23,7 @@ class CompanyDTO {
     return Company(
       id: id,
       name: name,
-      cnpj: cnpj,
+      document: document,
     );
   }
   
@@ -31,7 +31,7 @@ class CompanyDTO {
     return CompanyDTO(
       id: json['id'],
       name: json['name'],
-      cnpj: json['cnpj'],
+      document: json['document'],
       totalPonds: json['totalPonds'],
       activePonds: json['activePonds'],
       userRole: json['userRole'],
@@ -43,7 +43,7 @@ class CompanyDTO {
       CompanyDTO(
         id: '1',
         name: 'Camarão do Vale',
-        cnpj: '12.345.678/0001-90',
+        document: '12.345.678/0001-90',
         totalPonds: 8,
         activePonds: 6,
         userRole: 'owner',
@@ -51,7 +51,7 @@ class CompanyDTO {
       CompanyDTO(
         id: '2',
         name: 'Pescados Nordeste',
-        cnpj: '98.765.432/0001-10',
+        document: '98.765.432/0001-10',
         totalPonds: 5,
         activePonds: 4,
         userRole: 'admin',

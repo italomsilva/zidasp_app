@@ -6,7 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Watch(
             (context) => _buildStatItem(
               'Empresas',
-              '${controller.companiesCount.value}',
+              '${controller.totalCompanies.value}',
             ),
           ),
 

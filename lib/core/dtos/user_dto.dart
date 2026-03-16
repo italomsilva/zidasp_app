@@ -5,11 +5,9 @@ class UserDTO {
   final String name;
   final String email;
   final String document;
-
-  // Dados extras que só existem no DTO
-  final String role;
+  final int totalCompanies;
   final int totalPonds;
-  final int companiesCount;
+  final String role;
   final DateTime joinDate;
   final String token;
 
@@ -18,9 +16,9 @@ class UserDTO {
     required this.name,
     required this.email,
     required this.document,
-    required this.role,
+    required this.totalCompanies,
     required this.totalPonds,
-    required this.companiesCount,
+    required this.role,
     required this.joinDate,
     required this.token,
   });
@@ -31,19 +29,19 @@ class UserDTO {
   }
 
   // Cria DTO a partir de JSON (mock da API)
-  // Se você tem isso no DTO:
   factory UserDTO.fromJson(Map<String, dynamic> json) {
     return UserDTO(
-      id: json['id'] as String, // OK
-      name: json['name'] as String, // OK
-      email: json['email'] as String, // OK
-      document: json['document'] as String, // OK
-      role: json['role'] as String, // OK
-      joinDate: json['joinDate'] as DateTime, // PROBLEMA!
-      // O json['joinDate'] pode estar vindo como String, não DateTime
-      totalPonds: json['totalPonds'] as int, // OK
-      companiesCount: json['companiesCount'] as int, // OK
-      token: json['token'] as String, // OK
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      document: json['document']?.toString() ?? '',
+      joinDate: json['joinDate'] is DateTime 
+          ? json['joinDate'] 
+          : DateTime.tryParse(json['joinDate']?.toString() ?? '') ?? DateTime.now(),
+      totalCompanies: (json['totalCompanies'] ?? json['companiesCount'] ?? 0) as int,
+      totalPonds: (json['totalPonds'] ?? 0) as int,
+      role: json['role']?.toString() ?? 'user',
+      token: json['token']?.toString() ?? '',
     );
   }
 }

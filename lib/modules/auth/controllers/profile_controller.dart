@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:signals/signals.dart';
 import '../../../core/repositories/i_user_repository.dart';
 import '../../../core/sesssion/session_controller.dart';
-import '../dtos/user_dto.dart';
-import '../dtos/company_dto.dart';
+import '../../../core/dtos/user_dto.dart';
+import '../../../core/dtos/company_dto.dart';
 
 class ProfileController {
   final IUserRepository _repository;
@@ -17,11 +17,9 @@ class ProfileController {
   late final user = computed(() => userDTO.value?.toModel());
 
   // Outros computed para dados extras do DTO
-  late final userRole = computed(() => userDTO.value?.role ?? '');
+  late final totalCompanies = computed(() => userDTO.value?.totalCompanies ?? 0);
   late final totalPonds = computed(() => userDTO.value?.totalPonds ?? 0);
-  late final companiesCount = computed(
-    () => userDTO.value?.companiesCount ?? 0,
-  );
+  late final userRole = computed(() => userDTO.value?.role ?? '');
   late final joinDate = computed(() => userDTO.value?.joinDate);
   late final token = computed(() => userDTO.value?.token ?? '');
 
