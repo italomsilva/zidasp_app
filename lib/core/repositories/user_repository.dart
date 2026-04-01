@@ -5,84 +5,116 @@ import '../dtos/company_dto.dart';
 import '../exceptions/auth_exception.dart';
 import 'i_user_repository.dart';
 
+import 'package:zidasp_app/data/datasources/i_user_datasource.dart';
+
 class UserRepository implements IUserRepository {
-  // Retorna DTO com dados completos do MockData
+  final IUserDataSource _dataSource;
+
+  UserRepository(this._dataSource);
+
+  // Retorna DTO com dados completos - Enriquecimento (API + Mock) para compatibilidade
+  @override
   Future<UserDTO> getUserById(String id) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    final userJSON = MockData.users.firstWhere(
-      (u) => u['id'] == id,
-      orElse: () => throw Exception('User not found'),
-    );
+    try {
+      final userAPI = await _dataSource.getUserById(id);
+      
+      // Busca no MockData para enriquecer os campos ausentes na API
+      final mockUser = MockData.users.firstWhere(
+        (u) => u['id'] == id,
+        orElse: () => {},
+      );
 
-    // Injeta campos esperados pelo DTO vindos de relatórios (Simulação Server-Side)
-    final enrichedJSON = Map<String, dynamic>.from(userJSON);
-    enrichedJSON['role'] = UserRoleEnum.admin.value; // default temporario só para o dto nao quebrar
-    enrichedJSON['joinDate'] = DateTime.now();
-    enrichedJSON['totalPonds'] = 0;
-    enrichedJSON['companiesCount'] = 0;
+      final Map<String, dynamic> enrichedJSON = {
+        ...mockUser, // Dados mockados (metrics, role, etc)
+        ...userAPI,  // Dados reais da API (sobrescreve o que vier)
+      };
 
-    return UserDTO.fromJson(enrichedJSON);
+      // Garantir campos padrão se não existirem
+      enrichedJSON['role'] ??= UserRoleEnum.employee.value;
+      enrichedJSON['joinDate'] ??= DateTime.now();
+      enrichedJSON['totalPonds'] ??= 0;
+      enrichedJSON['companiesCount'] ??= 0;
+
+      return UserDTO.fromJson(enrichedJSON);
+    } catch (e) {
+      // Fallback para mock se a API falhar ou não encontrar
+      final mockUser = MockData.users.firstWhere(
+        (u) => u['id'] == id,
+        orElse: () => throw Exception('User not found'),
+      );
+      return UserDTO.fromJson(mockUser);
+    }
   }
 
   // Retorna lista de DTOs das empresas
+  @override
   Future<List<CompanyDTO>> getUserCompanies() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    // Por enquanto mantemos o mock das empresas já que o spec não define relação direta GET /user/:id/companies
     return CompanyDTO.mockList();
   }
 
   // Atualizar perfil (recebe model, retorna DTO)
+  @override
   Future<UserDTO> updateProfile({
     required String name,
     required String email,
     required String document,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Obtém o ID do usuário (simulação simplificada, em prod viria da Sessão)
+    const userId = 'uuid-user'; 
+    
+    final updatedData = await _dataSource.updateUser(userId, {
+      'name': name,
+      'email': email,
+      'document': document,
+    });
 
-    // Mock - retorna DTO atualizado
-    return UserDTO(
-      id: '1',
-      name: name,
-      email: email,
-      document: document,
-      role: UserRoleEnum.admin,
-      totalPonds: 15,
-      totalCompanies: 2,
-      joinDate: DateTime(2023, 1, 15),
-      token: 'mock_token_123',
-    );
+    return UserDTO.fromJson({
+      'role': UserRoleEnum.admin.value,
+      'totalPonds': 0,
+      'companiesCount': 0,
+      'joinDate': DateTime.now(),
+      ...updatedData,
+    });
   }
 
+  @override
   Future<void> logout() async {
     await Future.delayed(const Duration(milliseconds: 300));
   }
 
+  @override
   Future<UserDTO> login(String document, String password) async {
-    await Future.delayed(const Duration(seconds: 2));
-    try {
-      // Remover a formatação do CPF para comparar com o banco de dados
-      final cleanDocument = document.replaceAll(RegExp(r'[^0-9]'), '');
+    // Simulação de delay de rede
+    await Future.delayed(const Duration(seconds: 1));
 
+    try {
+      final cleanDocument = document.replaceAll(RegExp(r'[^0-9]'), '');
+      
+      // Busca no MockData diretamente conforme solicitado
       final userJSON = MockData.users.firstWhere(
-        (element) => element['document'] == cleanDocument,
-        orElse: () => throw Exception('User not found'),
+        (u) => u['document'] == cleanDocument,
+        orElse: () => throw InvalidCredentialsException('Usuário não encontrado (Mock).'),
       );
 
-      // Validação de senha simples para o mock (aceitando qlqr senha >= 6 chars por enquanto, ou podemos impor uma)
+      // Validação de senha simples
       if (password.length < 6) {
-        throw Exception('Password constraint');
+        throw InvalidCredentialsException('Senha muito curta.');
       }
 
-      final enrichedJSON = Map<String, dynamic>.from(userJSON);
-      enrichedJSON['role'] = UserRoleEnum.admin.value; // mock fallback
-      enrichedJSON['joinDate'] = DateTime.now();
-      enrichedJSON['totalPonds'] = 0;
-      enrichedJSON['companiesCount'] = 0;
+      final enrichedJSON = {
+        'role': UserRoleEnum.admin.value,
+        'joinDate': DateTime.now(),
+        'totalPonds': 0,
+        'companiesCount': 0,
+        'token': 'mock_token_${userJSON['id']}',
+        ...userJSON,
+      };
 
-      final result = UserDTO.fromJson(enrichedJSON);
-      return result;
+      return UserDTO.fromJson(enrichedJSON);
     } catch (e) {
-      print(e);
-      throw InvalidCredentialsException('CPF ou senha inválidos.');
+      if (e is InvalidCredentialsException) rethrow;
+      throw InvalidCredentialsException('Erro ao realizar login mockado.');
     }
   }
 }

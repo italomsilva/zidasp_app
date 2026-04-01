@@ -9,6 +9,12 @@ import 'package:zidasp_app/core/repositories/i_user_repository.dart';
 import 'package:zidasp_app/core/repositories/user_repository.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/core/theme/theme_controller.dart';
+import 'package:zidasp_app/data/datasources/user_datasource.dart';
+import 'package:zidasp_app/data/datasources/company_datasource.dart';
+import 'package:zidasp_app/data/datasources/pond_datasource.dart';
+import 'package:zidasp_app/data/datasources/i_user_datasource.dart';
+import 'package:zidasp_app/data/datasources/i_company_datasource.dart';
+import 'package:zidasp_app/data/datasources/i_pond_datasource.dart';
 
 final getIt = GetIt.instance;
 
@@ -20,18 +26,23 @@ class CoreModule {
     getIt.registerLazySingleton<Dio>(
       () => Dio(
         BaseOptions(
-          baseUrl: 'https://api.zidasp.com',
+          baseUrl: 'http://192.168.1.113:3000/',
           connectTimeout: const Duration(seconds: 30),
         ),
       ),
     );
 
+    // 1. DataSources
+    getIt.registerLazySingleton<IUserDataSource>(() => UserDataSource(getIt()));
+    getIt.registerLazySingleton<ICompanyDataSource>(() => CompanyDataSource(getIt()));
+    getIt.registerLazySingleton<IPondDataSource>(() => PondDataSource(getIt()));
+
     // 2. Repositórios
-    getIt.registerLazySingleton<IUserRepository>(() => UserRepository());
+    getIt.registerLazySingleton<IUserRepository>(() => UserRepository(getIt()));
 
-    getIt.registerLazySingleton<CompanyRepository>(() => CompanyRepository());
+    getIt.registerLazySingleton<CompanyRepository>(() => CompanyRepository(getIt()));
 
-    getIt.registerLazySingleton<PondRepository>(() => PondRepository());
+    getIt.registerLazySingleton<PondRepository>(() => PondRepository(getIt()));
 
     getIt.registerLazySingleton<TideRepository>(() => TideRepository());
 
