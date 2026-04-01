@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:zidasp_app/modules/auth/auth_module.dart';
 import 'package:zidasp_app/modules/pond/pond_module.dart';
 import 'package:zidasp_app/modules/tide/tide_module.dart';
+import 'package:zidasp_app/modules/admin/admin_module.dart';
 import 'core_module.dart';
 
 final getIt = GetIt.instance;
@@ -14,6 +15,7 @@ class DI {
     AuthModule.init();
     PondModule.init();
     TideModule.init();
+    AdminModule.init(); // <--- Adicionado
   }
 }
 

@@ -4,7 +4,6 @@ import 'package:zidasp_app/core/enums/user_role_enum.dart';
 import 'package:zidasp_app/core/enums/device_type.dart';
 import '../../../core/repositories/pond_repository.dart';
 import '../../../core/dtos/pond_dto.dart';
-import '../../../core/dtos/device_dto.dart';
 import '../../../core/dtos/actuator_dto.dart';
 
 class PondDetailController {
@@ -69,98 +68,4 @@ class PondDetailController {
     return currentUserRole.value == UserRoleEnum.admin;
   }
 
-  Future<void> toggleDevice(String deviceId, bool isOn) async {
-    if (!canManageDevices) {
-      pond.set(
-        AsyncState.error('Você não tem permissão para alterar dispositivos.'),
-      );
-      return;
-    }
-
-    if (togglingDeviceId.value != null) return; // Trava contra múltiplos clicks
-
-    togglingDeviceId.value = deviceId;
-
-    // Atualização otimista
-    _updateDeviceLocally(deviceId, isOn);
-
-    try {
-      await _repository.toggleDevice(pondId.value, deviceId, isOn);
-
-      // Busca status fresco para confirmar a transação do "DB" após o delay
-      await loadPondDetails();
-    } catch (e) {
-      // Reverter em caso de erro
-      _updateDeviceLocally(deviceId, !isOn);
-      pond.set(AsyncState.error(e));
-    } finally {
-      togglingDeviceId.value = null;
-    }
-  }
-
-  void _updateDeviceLocally(String deviceId, bool isOn) {
-    if (pond.value.value == null) return;
-
-    final updatedDevices = pond.value.value!.devices.map((device) {
-      if (device.id == deviceId) {
-        return DeviceDTO(
-          id: device.id,
-          name: device.name,
-          type: device.type,
-          isOn: isOn,
-          power: device.power,
-          batteryLevel: device.batteryLevel,
-          lastActive: DateTime.now(),
-        );
-      }
-      return device;
-    }).toList();
-
-    final List<ActuatorDTO> updatedActuators = pond.value.value!.actuators.map((actuator) {
-      if (actuator.id == deviceId) {
-        return ActuatorDTO(
-          id: actuator.id,
-          name: actuator.name,
-          type: actuator.type,
-          active: isOn,
-          pondId: actuator.pondId,
-        );
-      }
-      return actuator;
-    }).toList();
-
-    // Recalcula totais
-    final aeratorsCount = updatedActuators
-        .where((ActuatorDTO d) => d.type == DeviceType.aerator && d.active)
-        .length;
-    final pumpsCount = updatedActuators
-        .where((ActuatorDTO d) => d.type == DeviceType.pump && d.active)
-        .length;
-
-    pond.set(
-      AsyncState.data(
-        PondDTO(
-          id: pond.value.value!.id,
-          name: pond.value.value!.name,
-          companyId: pond.value.value!.companyId,
-          oxygen: pond.value.value!.oxygen,
-          temperature: pond.value.value!.temperature,
-          salinity: pond.value.value!.salinity,
-          ph: pond.value.value!.ph,
-          transparency: pond.value.value!.transparency,
-          aeratorsOn: aeratorsCount,
-          aeratorsTotal: pond.value.value!.aeratorsTotal,
-          pumpsOn: pumpsCount,
-          pumpsTotal: pond.value.value!.pumpsTotal,
-          hasAlert: pond.value.value!.hasAlert,
-          isFavorite: pond.value.value!.isFavorite,
-          isAutomatic: pond.value.value!.isAutomatic,
-          lastUpdate: DateTime.now(),
-          devices: updatedDevices,
-          sensors: pond.value.value!.sensors,
-          actuators: updatedActuators,
-        ),
-      ),
-    );
-  }
 }

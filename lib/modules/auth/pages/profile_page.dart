@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:zidasp_app/core/di.dart';
+import 'package:zidasp_app/core/enums/user_role_enum.dart';
+import 'package:zidasp_app/modules/admin/pages/admin_panel_page.dart';
 import 'package:zidasp_app/widgets/shared/custom_card.dart';
 import '../../../core/theme/app_theme.dart';
 import '../controllers/profile_controller.dart';
@@ -20,243 +22,333 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       body: Watch((context) {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.shrimpAlert),
+          );
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _buildProfileHeader(),
-              const SizedBox(height: 16),
-              _buildStatsCard(), // Card com dados extras do DTO
-              const SizedBox(height: 16),
-              _buildCompaniesCard(),
-              const SizedBox(height: 16),
-              _buildSettingsCard(),
-            ],
-          ),
+        return CustomScrollView(
+          slivers: [
+            _buildSliverHeader(context),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    _buildStatsCard(),
+                    const SizedBox(height: 24),
+                    _buildCompaniesSection(),
+                    const SizedBox(height: 24),
+                    _buildSettingsSection(),
+                    const SizedBox(height: 48),
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       }),
     );
   }
 
-  Widget _buildProfileHeader() {
-    return CustomCard(
-      child: Column(
-        children: [
-          // Avatar
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: AppColors.shrimpAlert.withValues(alpha: 0.1),
-            child: Watch(
-              (context) => Text(
-                controller.userInitials.value,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.shrimpAlert,
-                ),
-              ),
-            ),
+  Widget _buildSliverHeader(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 220,
+      pinned: true,
+      elevation: 0,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 60),
+              _buildAvatar(),
+              const SizedBox(height: 16),
+              _buildUserNameAndEmail(context),
+            ],
           ),
-
-          const SizedBox(height: 16),
-
-          // Nome
-          Watch(
-            (context) => Text(
-              controller.userName.value,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          // Email
-          Watch(
-            (context) => Text(
-              controller.userEmail.value,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-            ),
-          ),
-
-          // Role badge (vem do DTO)
-          Watch(
-            (context) => Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: controller
-                    .getRoleColor(controller.userRole.value)
-                    .withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                controller.userRole.value?.value.toUpperCase() ?? '',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: controller.getRoleColor(controller.userRole.value),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildAvatar() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.shrimpAlert.withValues(alpha: 0.1),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.shrimpAlert.withValues(alpha: 0.2),
+          width: 2,
+        ),
+      ),
+      child: CircleAvatar(
+        radius: 45,
+        backgroundColor: AppColors.shrimpAlert.withValues(alpha: 0.05),
+        child: Watch(
+          (context) => Text(
+            controller.userInitials.value,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppColors.shrimpAlert,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserNameAndEmail(BuildContext context) {
+    return Column(
+      children: [
+        Watch(
+          (context) => Text(
+            controller.userName.value,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Watch(
+          (context) => Text(
+            controller.userEmail.value,
+            style: const TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildStatsCard() {
     return CustomCard(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          // Total viveiros (do DTO)
-          Watch(
-            (context) =>
-                _buildStatItem('Viveiros', '${controller.totalPonds.value}'),
-          ),
-
-          // Total empresas (do DTO)
-          Watch(
-            (context) => _buildStatItem(
-              'Empresas',
-              '${controller.totalCompanies.value}',
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Watch(
+              (context) => _buildStatItem(
+                Icons.waves,
+                'Viveiros',
+                '${controller.totalPonds.value}',
+              ),
             ),
-          ),
-
-          // Data de cadastro (do DTO)
-          Watch(
-            (context) => _buildStatItem(
-              'Desde',
-              controller.joinDate.value?.year.toString() ?? '',
+            _buildVerticalDivider(),
+            Watch(
+              (context) => _buildStatItem(
+                Icons.business,
+                'Empresas',
+                '${controller.totalCompanies.value}',
+              ),
             ),
-          ),
-        ],
+            _buildVerticalDivider(),
+            Watch(
+              (context) => _buildStatItem(
+                Icons.calendar_today,
+                'Desde',
+                controller.joinDate.value?.year.toString() ?? '',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildVerticalDivider() {
+    return Container(
+      height: 40,
+      width: 1,
+      color: Colors.grey.withValues(alpha: 0.2),
+    );
+  }
+
+  Widget _buildStatItem(IconData icon, String label, String value) {
     return Column(
       children: [
+        Icon(icon, size: 20, color: AppColors.shrimpAlert),
+        const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
       ],
     );
   }
 
-  Widget _buildCompaniesCard() {
-    return Watch((context) {
-      final companies = controller.companiesDTO.value;
-
-      return CustomCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Empresas Associadas',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  Widget _buildCompaniesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'MINHAS EMPRESAS',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: Colors.grey,
             ),
+          ),
+        ),
+        Watch((context) {
+          final companies = controller.companiesDTO.value;
+          if (companies.isEmpty)
+            return const Text('Nenhuma empresa encontrada');
 
-            const SizedBox(height: 16),
+          return Column(
+            children: companies
+                .map((company) => _buildCompanyItem(company))
+                .toList(),
+          );
+        }),
+      ],
+    );
+  }
 
-            ...companies.map((company) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.shrimpAlert.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.business,
-                      color: AppColors.shrimpAlert,
-                      size: 20,
-                    ),
+  Widget _buildCompanyItem(dynamic company) {
+    final isAdmin = company.userRole == UserRoleEnum.admin;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: CustomCard(
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 4,
+          ),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.shrimpAlert.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.business, color: AppColors.shrimpAlert),
+          ),
+          title: Text(
+            company.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            '${company.totalPonds} viveiros • ${company.activePonds} ativos',
+            style: const TextStyle(fontSize: 12),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildRoleBadge(company.userRole),
+              if (isAdmin) ...[
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                    color: AppColors.shrimpAlert,
+                    size: 22,
                   ),
-                  title: Text(company.name),
-                  subtitle: Text(
-                    '${company.totalPonds} viveiros • ${company.activePonds} ativos',
-                  ),
-                  trailing: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: controller
-                          .getRoleColor(company.userRole)
-                          .withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      company.userRole.value.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: controller.getRoleColor(company.userRole),
-                      ),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AdminPanelPage(companyId: company.id),
                     ),
                   ),
                 ),
-              );
-            }).toList(),
-          ],
+              ],
+            ],
+          ),
         ),
-      );
-    });
-  }
-
-  Widget _buildSettingsCard() {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Configurações',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 8),
-
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Editar Perfil'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: _showEditDialog,
-          ),
-
-          ListTile(
-            leading: const Icon(Icons.lock),
-            title: const Text('Alterar Senha'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: _showPasswordDialog,
-          ),
-
-          const Divider(),
-
-          ListTile(
-            leading: const Icon(Icons.logout, color: AppColors.shrimpAlert),
-            title: const Text(
-              'Sair',
-              style: TextStyle(color: AppColors.shrimpAlert),
-            ),
-            onTap: _showLogoutDialog,
-          ),
-        ],
       ),
     );
   }
+
+  Widget _buildRoleBadge(UserRoleEnum role) {
+    final color = controller.getRoleColor(role);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        role.value.toUpperCase(),
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'CONFIGURAÇÕES DA CONTA',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        CustomCard(
+          child: Column(
+            children: [
+              _buildSettingsTile(
+                Icons.person_outline,
+                'Editar Perfil',
+                _showEditDialog,
+              ),
+              const Divider(height: 1),
+              _buildSettingsTile(
+                Icons.lock_outline,
+                'Alterar Senha',
+                _showPasswordDialog,
+              ),
+              const Divider(height: 1),
+              _buildSettingsTile(
+                Icons.logout,
+                'Sair',
+                _showLogoutDialog,
+                isDestructive: true,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingsTile(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    bool isDestructive = false,
+  }) {
+    final color = isDestructive ? AppColors.shrimpAlert : null;
+    return ListTile(
+      leading: Icon(icon, color: color ?? Colors.grey),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: color,
+          fontWeight: isDestructive ? FontWeight.bold : null,
+        ),
+      ),
+      trailing: const Icon(Icons.chevron_right, size: 20),
+      onTap: onTap,
+    );
+  }
+
+  /* --- Diálogos (Sem alterações estruturais, apenas manter funcionalidade) --- */
 
   void _showEditDialog() {
     final nameController = TextEditingController(
@@ -273,6 +365,7 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Editar Perfil'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -295,7 +388,10 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
-          TextButton(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.shrimpAlert,
+            ),
             onPressed: () async {
               Navigator.pop(context);
               await controller.updateProfile(
@@ -311,16 +407,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _showPasswordDialog() {
-    // Implementar...
-  }
+  void _showPasswordDialog() {}
 
   void _showLogoutDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Sair'),
-        content: const Text('Tem certeza que deseja sair?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: const Text('Tem certeza que deseja sair da conta?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -330,11 +425,13 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () async {
               Navigator.pop(context);
               await controller.logout();
-              // Navegar para login
             },
             child: const Text(
               'Sair',
-              style: TextStyle(color: AppColors.shrimpAlert),
+              style: TextStyle(
+                color: AppColors.shrimpAlert,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],

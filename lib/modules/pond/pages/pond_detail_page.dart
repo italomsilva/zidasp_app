@@ -112,7 +112,9 @@ class _PondDetailPageState extends State<PondDetailPage> {
                               clipBehavior: Clip.none,
                               physics: const BouncingScrollPhysics(),
                               child: Row(
-                                children: controller.sensors.value.map((sensor) {
+                                children: controller.sensors.value.map((
+                                  sensor,
+                                ) {
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 24),
                                     child: SensorRingChart(
@@ -167,7 +169,8 @@ class _PondDetailPageState extends State<PondDetailPage> {
                                     shrinkWrap: true,
                                     physics:
                                         const NeverScrollableScrollPhysics(),
-                                    itemCount: controller.actuators.value.length,
+                                    itemCount:
+                                        controller.actuators.value.length,
                                     separatorBuilder: (context, index) =>
                                         const SizedBox(height: 8),
                                     itemBuilder: (context, index) {
@@ -186,12 +189,7 @@ class _PondDetailPageState extends State<PondDetailPage> {
                                               device.id,
                                           disabled:
                                               !controller.canManageDevices,
-                                          onChanged: (value) {
-                                            controller.toggleDevice(
-                                              device.id,
-                                              value,
-                                            ); // fixed device.id which was device.pondId in mockup
-                                          },
+                                          onChanged: (value) {},
                                         ),
                                       );
                                     },

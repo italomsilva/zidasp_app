@@ -16,7 +16,7 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
   
-  late final List<Widget> _pages = [
+  final List<Widget> _pages = [
     const PondListPage(),
     const TidePage(),
     const ProfilePage(),
@@ -33,7 +33,7 @@ class _MainNavigationState extends State<MainNavigation> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(_titles[_selectedIndex], style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(_titles[_selectedIndex], style: const TextStyle(fontWeight: FontWeight.bold)),
         actions: const [
           ThemeSwitcher(),
         ],
@@ -61,4 +61,4 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
     );
   }
-}
+}

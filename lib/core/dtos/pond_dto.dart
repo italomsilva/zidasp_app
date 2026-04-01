@@ -4,7 +4,6 @@ import 'package:zidasp_app/core/models/pond.dart';
 import 'package:zidasp_app/data/mock_data.dart';
 import 'package:zidasp_app/core/enums/device_type.dart';
 
-import 'device_dto.dart';
 
 class PondDTO {
   final String id;
@@ -25,7 +24,6 @@ class PondDTO {
   final bool isFavorite;
   final bool isAutomatic;
   final DateTime lastUpdate;
-  final List<DeviceDTO> devices;
   final List<SensorDTO> sensors;
   final List<ActuatorDTO> actuators;
 
@@ -46,7 +44,6 @@ class PondDTO {
     required this.isFavorite,
     required this.isAutomatic,
     required this.lastUpdate,
-    required this.devices,
     required this.sensors,
     required this.actuators,
   });
@@ -95,58 +92,10 @@ class PondDTO {
               ? DateTime.parse(json['lastUpdate'].toString()) 
               : DateTime.now()),
           
-      devices: json['devices'] != null 
-          ? (json['devices'] as List).map((e) => DeviceDTO.fromJson(e)).toList()
-          : _mockDevices(json['id']),
       sensors: (json['sensors'] as List?)?.map((e) => SensorDTO.fromJson(e)).toList() 
           ?? MockData.sensors.map((e) => SensorDTO.fromJson(e)).toList(),
       actuators: (json['actuators'] as List?)?.map((e) => ActuatorDTO.fromJson(e)).toList() 
           ?? MockData.actuators.map((e) => ActuatorDTO.fromJson(e)).toList(),
     );
-  }
-
-  static List<DeviceDTO> _mockDevices(String pondId) {
-    return [
-      DeviceDTO(
-        id: '${pondId}_a1',
-        name: 'Aerador Principal',
-        type: DeviceType.aerator,
-        isOn: true,
-        power: '2.5 kW',
-        lastActive: DateTime.now(),
-      ),
-      DeviceDTO(
-        id: '${pondId}_a2',
-        name: 'Aerador Secundário',
-        type: DeviceType.aerator,
-        isOn: false,
-        power: '2.0 kW',
-        lastActive: DateTime.now().subtract(const Duration(hours: 2)),
-      ),
-      DeviceDTO(
-        id: '${pondId}_b1',
-        name: 'Bomba de Água',
-        type: DeviceType.pump,
-        isOn: true,
-        power: '5.0 kW',
-        lastActive: DateTime.now(),
-      ),
-      DeviceDTO(
-        id: '${pondId}_s1',
-        name: 'Sensor O₂',
-        type: DeviceType.sensor,
-        isOn: true,
-        batteryLevel: 85,
-        lastActive: DateTime.now(),
-      ),
-      DeviceDTO(
-        id: '${pondId}_s2',
-        name: 'Sensor Temperatura',
-        type: DeviceType.sensor,
-        isOn: true,
-        batteryLevel: 92,
-        lastActive: DateTime.now(),
-      ),
-    ];
   }
 }
