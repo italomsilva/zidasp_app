@@ -424,8 +424,10 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final navigator = Navigator.of(context, rootNavigator: true);
+              navigator.pop(); // Fecha o dialog
               await controller.logout();
+              navigator.pushNamedAndRemoveUntil('/login', (route) => false);
             },
             child: const Text(
               'Sair',

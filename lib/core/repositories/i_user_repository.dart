@@ -3,7 +3,7 @@ import '../dtos/user_dto.dart';
 
 abstract class IUserRepository {
   Future<UserDTO> getUserById(String id);
-  Future<List<CompanyDTO>> getUserCompanies();
+  Future<List<CompanyDTO>> getUserCompanies(String userId);
   Future<UserDTO> updateProfile({
     required String name,
     required String email,

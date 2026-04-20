@@ -52,7 +52,7 @@ class ProfileController {
       // Carrega dados em paralelo
       final results = await Future.wait([
         _repository.getUserById(session.id),
-        _repository.getUserCompanies(),
+        _repository.getUserCompanies(session.id),
       ]);
 
       userDTO.value = results[0] as UserDTO;
@@ -91,6 +91,7 @@ class ProfileController {
 
   Future<void> logout() async {
     await _repository.logout();
+    await _sessionController.logout();
     userDTO.value = null;
     companiesDTO.value = [];
   }

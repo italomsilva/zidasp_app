@@ -46,11 +46,39 @@ class UserRepository implements IUserRepository {
     }
   }
 
-  // Retorna lista de DTOs das empresas
+  // Retorna lista de DTOs das empresas enriquecida com dados do Mock
   @override
-  Future<List<CompanyDTO>> getUserCompanies() async {
-    // Por enquanto mantemos o mock das empresas já que o spec não define relação direta GET /user/:id/companies
-    return CompanyDTO.mockList();
+  Future<List<CompanyDTO>> getUserCompanies(String userId) async {
+    // Busca as relações usuário-empresa no MockData
+    final userRelations = MockData.userCompanies.where((uc) => uc['userId'] == userId).toList();
+    
+    final List<CompanyDTO> dtos = [];
+
+    for (var relation in userRelations) {
+      final companyId = relation['companyId'];
+      final roleStr = relation['role'] as String;
+      
+      // Busca os dados da empresa
+      final companyMap = MockData.companies.firstWhere((c) => c['id'] == companyId, orElse: () => {});
+      if (companyMap.isEmpty) continue;
+
+      // Calcula métricas da empresa
+      final companyPonds = MockData.ponds.where((p) => p['companyId'] == companyId).toList();
+      final totalPonds = companyPonds.length;
+      // Simulação: viveiros ativos são aqueles que não têm alerta grave (exemplo)
+      final activePonds = companyPonds.where((p) => p['hasAlert'] == false).length;
+
+      dtos.add(CompanyDTO(
+        id: companyId,
+        name: companyMap['name'],
+        document: companyMap['document'],
+        totalPonds: totalPonds,
+        activePonds: activePonds,
+        userRole: UserRoleEnum.fromString(roleStr),
+      ));
+    }
+
+    return dtos;
   }
 
   // Atualizar perfil (recebe model, retorna DTO)
