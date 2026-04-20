@@ -13,7 +13,7 @@ void main() async {
 }
 
 class ZidaspApp extends StatelessWidget {
-  const ZidaspApp({Key? key}) : super(key: key);
+  const ZidaspApp({super.key});
 
   @override
   Widget build(BuildContext context) {

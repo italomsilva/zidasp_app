@@ -196,8 +196,9 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         Watch((context) {
           final companies = controller.companiesDTO.value;
-          if (companies.isEmpty)
+          if (companies.isEmpty) {
             return const Text('Nenhuma empresa encontrada');
+          }
 
           return Column(
             children: companies

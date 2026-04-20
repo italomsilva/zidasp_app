@@ -7,7 +7,7 @@ import '../modules/tide/pages/tide_page.dart';
 import '../modules/auth/pages/profile_page.dart';
 
 class MainNavigation extends StatefulWidget {
-  const MainNavigation({Key? key}) : super(key: key);
+  const MainNavigation({super.key});
   
   @override
   State<MainNavigation> createState() => _MainNavigationState();
@@ -61,4 +61,4 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
     );
   }
-}
+}

@@ -6,7 +6,7 @@ import '../controllers/tide_controller.dart';
 import '../../../core/repositories/tide_repository.dart';
 
 class TidePage extends StatefulWidget {
-  const TidePage({Key? key}) : super(key: key);
+  const TidePage({super.key});
   
   @override
   State<TidePage> createState() => _TidePageState();
@@ -305,7 +305,7 @@ class _TidePageState extends State<TidePage> {
                     ],
                   ),
                 );
-              }).toList(),
+              }),
             ],
           ),
         );

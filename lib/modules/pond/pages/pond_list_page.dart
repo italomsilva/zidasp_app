@@ -10,7 +10,7 @@ import 'package:zidasp_app/widgets/error/error_container.dart';
 import 'package:zidasp_app/widgets/shared/stats_count.dart';
 
 class PondListPage extends StatefulWidget {
-  const PondListPage({Key? key}) : super(key: key);
+  const PondListPage({super.key});
 
   @override
   State<PondListPage> createState() => _PondListPageState();

@@ -40,7 +40,6 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: AppColors.shrimpAlert,
       secondary: AppColors.healthGreen,
-      background: AppColors.lightBackground,
       surface: AppColors.lightSurface,
     ),
     splashColor: AppColors.shrimpAlert.withAlpha(20),
@@ -58,7 +57,6 @@ class AppTheme {
     colorScheme: const ColorScheme.dark(
       primary: AppColors.shrimpAlert,
       secondary: AppColors.healthGreen,
-      background: AppColors.darkBackground,
       surface: AppColors.darkSurface,
     ),
     splashColor: AppColors.shrimpAlert.withAlpha(10),

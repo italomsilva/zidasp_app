@@ -2,7 +2,6 @@ import 'package:zidasp_app/core/dtos/actuator_dto.dart';
 import 'package:zidasp_app/core/dtos/sensor_dto.dart';
 import 'package:zidasp_app/core/models/pond.dart';
 import 'package:zidasp_app/data/mock_data.dart';
-import 'package:zidasp_app/core/enums/device_type.dart';
 
 
 class PondDTO {

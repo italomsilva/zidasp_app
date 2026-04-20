@@ -8,16 +8,15 @@ class AuthException implements Exception {
 }
 
 class InvalidCredentialsException extends AuthException {
-  InvalidCredentialsException([String message = 'CPF ou senha incorretos.'])
-    : super(message);
+  InvalidCredentialsException([super.message = 'CPF ou senha incorretos.']);
 }
 
 class NetworkException extends AuthException {
   NetworkException([
-    String message = 'Erro de conexão. Verifique sua internet.',
-  ]) : super(message);
+    super.message = 'Erro de conexão. Verifique sua internet.',
+  ]);
 }
 
 class ValidationException extends AuthException {
-  ValidationException(String message) : super(message);
+  ValidationException(super.message);
 }

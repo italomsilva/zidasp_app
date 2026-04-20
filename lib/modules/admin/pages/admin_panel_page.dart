@@ -10,7 +10,7 @@ import '../controllers/admin_controller.dart';
 
 class AdminPanelPage extends StatefulWidget {
   final String? companyId;
-  const AdminPanelPage({Key? key, this.companyId}) : super(key: key);
+  const AdminPanelPage({super.key, this.companyId});
 
   @override
   State<AdminPanelPage> createState() => _AdminPanelPageState();
@@ -316,7 +316,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> with SingleTickerProvid
 
   Widget _buildDropdown<T>({required String label, required T? value, required IconData icon, required List<DropdownMenuItem<T>> items, required ValueChanged<T?> onChanged}) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

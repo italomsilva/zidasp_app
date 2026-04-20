@@ -10,14 +10,14 @@ class CustomCard extends StatelessWidget {
   final double elevation;
   
   const CustomCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.hasBorder = false,
     this.borderColor,
     this.onTap,
     this.elevation = 2.0,
-  }) : super(key: key);
+  });
   
   @override
   Widget build(BuildContext context) {

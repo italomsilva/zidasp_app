@@ -13,7 +13,7 @@ class DeviceController extends StatefulWidget {
   final Function(bool)? onChanged;
 
   const DeviceController({
-    Key? key,
+    super.key,
     required this.deviceName,
     required this.deviceType,
     required this.isOn,
@@ -22,7 +22,7 @@ class DeviceController extends StatefulWidget {
     this.disabled = false,
     this.isLoading = false,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   _DeviceControllerState createState() => _DeviceControllerState();

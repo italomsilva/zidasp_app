@@ -16,7 +16,7 @@ class CustomTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.labelText,
     required this.hintText,
     required this.prefixIcon,
@@ -28,7 +28,7 @@ class CustomTextField extends StatelessWidget {
     this.errorText,
     this.onChanged,
     this.inputFormatters,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

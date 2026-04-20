@@ -4,7 +4,7 @@ import 'package:zidasp_app/core/di.dart';
 import '../../core/theme/theme_controller.dart';
 
 class ThemeSwitcher extends StatelessWidget {
-  const ThemeSwitcher({Key? key}) : super(key: key);
+  const ThemeSwitcher({super.key});
   
   @override
   Widget build(BuildContext context) {

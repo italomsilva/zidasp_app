@@ -9,10 +9,10 @@ class PondCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const PondCard({
-    Key? key,
+    super.key,
     required this.pond,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

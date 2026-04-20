@@ -1,10 +1,8 @@
 import 'package:signals/signals.dart';
 import 'package:zidasp_app/core/sesssion/session_controller.dart';
 import 'package:zidasp_app/core/enums/user_role_enum.dart';
-import 'package:zidasp_app/core/enums/device_type.dart';
 import '../../../core/repositories/pond_repository.dart';
 import '../../../core/dtos/pond_dto.dart';
-import '../../../core/dtos/actuator_dto.dart';
 
 class PondDetailController {
   final PondRepository _repository;
