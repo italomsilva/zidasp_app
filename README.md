@@ -40,3 +40,21 @@ Utilize qualquer um destes CPFs matematicamente válidos. Não digite a formata�
 ---
 
 Obrigado por ajudar no processo de testes de front-end do nosso sistema!
+
+## 💻 Stack Tecnológica
+
+O Zidasp App foi construído com ferramentas modernas para garantir alta performance, facilidade de manutenção e uma arquitetura escalável.
+
+- **[Flutter](https://flutter.dev/) & [Dart](https://dart.dev/):** Framework e linguagem base para desenvolvimento em diversas plataformas.
+- **[Dio](https://pub.dev/packages/dio):** Cliente HTTP poderoso utilizado para a comunicação com nossa API REST.
+- **[GetIt](https://pub.dev/packages/get_it):** Padrão de Service Locator para a injeção de dependências.
+- **[Signals](https://pub.dev/packages/signals):** Utilizado para o controle de estado da aplicação (State Management) de forma reativa e leve.
+- **[Flutter Secure Storage](https://pub.dev/packages/flutter_secure_storage):** Armazenamento de dados sensíveis na camada local.
+
+## 📡 Integração com Sensores IoT (MQTT)
+
+Como se trata de um aplicativo voltado para aquicultura (precisão nos parâmetros da água é vital), um dos próximos grandes passos do projeto é a **integração com o protocolo MQTT**.
+
+Isso possibilitará recursos como:
+- **Telemetria em tempo real:** Leitura instantânea de sensores instalados nas fazendas/viveiros (como níveis de oxigênio dissolvido, pH e variação de temperatura).
+- **Controle de Atuadores:** Envio de comandos via mensageria para ligar ou desligar os aeradores remotamente, otimizando o gasto de energia e a resposta a emergências ambientais.

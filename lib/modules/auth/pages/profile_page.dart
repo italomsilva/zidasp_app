@@ -52,17 +52,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSliverHeader(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 220,
-      pinned: true,
-      elevation: 0,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Center(
+    return SliverToBoxAdapter(
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 60),
               _buildAvatar(),
               const SizedBox(height: 16),
               _buildUserNameAndEmail(context),
